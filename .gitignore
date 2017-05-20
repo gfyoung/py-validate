@@ -6,4 +6,5 @@
 *.iml
 
 # Python files
+.cache
 *.pyc
