@@ -1,0 +1,22 @@
+notifications:
+  email: false
+
+language: python
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+
+python:
+  - "2.7"
+  - "3.5"
+  - "3.6"
+
+install:
+  - pip install flake8 pytest -U
+
+script:
+  - pytest
+  - flake8

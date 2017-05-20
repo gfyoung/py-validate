@@ -1,3 +1,4 @@
+import sys
 import pytest
 
 from py_validate.validator import validate_inputs
@@ -39,16 +40,27 @@ def test_valid():
 
 def test_wrong_number_of_args():
     # We expect Python to handle this for us.
+    py3 = sys.version_info >= (3, 0)
 
     with pytest.raises(TypeError) as exc_info:
         increment(1, 1.5)
 
-    exc_info.match("takes 1 positional argument")
+    if py3:
+        matcher = "takes 1 positional argument"
+    else:  # Python 2.x
+        matcher = "takes exactly 1 argument"
+
+    exc_info.match(matcher)
 
     with pytest.raises(TypeError) as exc_info:
         increment()
 
-    exc_info.match("missing 1 required positional argument")
+    if py3:
+        matcher = "missing 1 required positional argument"
+    else:  # Python 2.x
+        matcher = "takes exactly 1 argument"
+
+    exc_info.match(matcher)
 
 
 def test_invalid_type():
