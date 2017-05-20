@@ -1,7 +1,7 @@
-import sys
-import pytest
-
 from py_validate.validator import validate_inputs
+
+import pytest
+import sys
 
 
 @validate_inputs(a=int)
@@ -20,6 +20,22 @@ def operate_only_even(a):
 
 
 @validate_inputs(a=int)
+def operate_var_args(a, *args):
+    if len(args) > 1:
+        return a - 1
+    else:
+        return a + 1
+
+
+@validate_inputs(a=int)
+def operate_kwargs(a, **kwargs):
+    if kwargs:
+        return a - 1
+    else:
+        return a + 1
+
+
+@validate_inputs(a=int)
 def validate_odd(a):
     if a % 2 != 1:
         raise ValueError("Odd number expected")
@@ -31,11 +47,21 @@ def operate_only_odd(a):
 
 
 def test_valid():
+    # The types are correct.
     assert increment(1) == 2
+    assert operate_only_odd(7) == -2
+
+    # These should pass validation.
+    assert operate_only_even(2) == -4
     assert increment_no_match(5) == 4
 
-    assert operate_only_odd(7) == -2
-    assert operate_only_even(2) == -4
+    # These var-args tests shouldn't raise.
+    assert operate_var_args(1, 5) == 2
+    assert operate_var_args(1, 5, "foo") == 0
+
+    # These kwargs tests shouldn't raise.
+    assert operate_kwargs(1) == 2
+    assert operate_kwargs(1, b=5, c=2) == 0
 
 
 def test_wrong_number_of_args():
@@ -63,16 +89,36 @@ def test_wrong_number_of_args():
     exc_info.match(matcher)
 
 
+def test_invalid_kwargs():
+    # We expect Python to handle this for us.
+    with pytest.raises(TypeError) as exc_info:
+        operate_kwargs(1, a=1)
+
+    exc_info.match("got multiple values for argument")
+
+
 def test_invalid_type():
+    matcher = "Incorrect type passed in"
+
     with pytest.raises(TypeError) as exc_info:
         increment(1.5)
 
-    exc_info.match("Incorrect type passed in")
+    exc_info.match(matcher)
 
     with pytest.raises(TypeError) as exc_info:
         operate_only_odd(1.5)
 
-    exc_info.match("Incorrect type passed in")
+    exc_info.match(matcher)
+
+    with pytest.raises(TypeError) as exc_info:
+        operate_var_args("foo", 1, 2)
+
+    exc_info.match(matcher)
+
+    with pytest.raises(TypeError) as exc_info:
+        operate_kwargs(a="foo", b=5)
+
+    exc_info.match(matcher)
 
     # No argument matches, so raise whatever
     # error Python is raising natively.
