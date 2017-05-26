@@ -12,6 +12,16 @@ __all__ = ["validate_inputs", "validate_outputs"]
 class _ValidatedFunction(object):
 
     def __init__(self, f):
+        """
+        Initialize a _ValidatedFunction instance.
+
+        Parameters
+        ----------
+        f : callable
+            The function that we wish to wrap for validation. We assume that
+            we are not passing in another _ValidatedFunction instance.
+        """
+
         self.f = f
         self.var_names = f.__code__.co_varnames
 
@@ -19,6 +29,14 @@ class _ValidatedFunction(object):
         self._output_validators = tuple()
 
     def __call__(self, *args, **kwargs):
+        """
+        Wrapper method around calling `f`.
+
+        Before calling the function, the inputs are validated, and after the
+        function is called, the outputs are validated. If all checks pass, the
+        output of the function call is returned.
+        """
+
         self._validate_inputs(*args, **kwargs)
         result = self.f(*args, **kwargs)
 
@@ -29,11 +47,31 @@ class _ValidatedFunction(object):
 
         return result
 
-    def update_input_validators(self, **kwargs):
-        self._input_validators.update(**kwargs)
+    def update_input_validators(self, **validators):
+        """
+        Update the input validators.
 
-    def update_output_validators(self, *args):
-        self._output_validators = self._output_validators + args
+        Parameters
+        ----------
+        validators : kwargs
+            The new input validators to add / update in the existing ones.
+        """
+
+        self._input_validators.update(**validators)
+
+    def update_output_validators(self, *validators):
+        """
+        Update the output validators.
+
+        This function will append new validators to the existing ones.
+
+        Parameters
+        ----------
+        validators : args
+            The new output validators to add to the existing ones.
+        """
+
+        self._output_validators = self._output_validators + validators
 
     @staticmethod
     def _check_value(arg, val, validator):
@@ -77,6 +115,10 @@ class _ValidatedFunction(object):
                 raise ValueError(msg.format(inp_name=arg, val=val))
 
     def _validate_inputs(self, *args, **kwargs):
+        """
+        Validate the inputs to a function.
+        """
+
         for index, val in enumerate(args):
             # Too many arguments have been provided,
             # but let Python handle this instead of us.
@@ -101,6 +143,10 @@ class _ValidatedFunction(object):
             self._check_value(var_name, val, validator)
 
     def _validate_outputs(self, *args):
+        """
+        Validate the outputs of a function.
+        """
+
         for index, validator in enumerate(self._output_validators):
             if index >= len(args):
                 break
