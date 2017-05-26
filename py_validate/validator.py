@@ -1,3 +1,11 @@
+"""
+Provides wrapper functions to validate inputs and outputs for functions.
+
+This wrappers work by instantiating a class object that wraps the function
+to accept input and output validators that are then used to check inputs and
+outputs before and after the function is called respectively.
+"""
+
 __all__ = ["validate_inputs", "validate_outputs"]
 
 
