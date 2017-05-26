@@ -1,47 +1,100 @@
-import functools
-
 __all__ = ["validate_inputs", "validate_outputs"]
 
 
-def _check_value(arg, val, validator):
-    """
-    Check whether a value provided for an argument is valid.
+class _ValidatedFunction(object):
 
-    Parameters
-    ----------
-    arg : str
-        The name of the argument.
-    val : val
-        The value of the argument.
-    validator : type, callable, or None
-        The method to call to validate the argument OR type to check against.
+    def __init__(self, f):
+        self.f = f
+        self.var_names = f.__code__.co_varnames
 
-    Raises
-    ------
-    TypeError : the argument had a type mismatch with `validator`
-    ValueError : the `validator` callable failed with `val`
-    """
+        self.input_validators = {}
+        self.output_validators = tuple()
 
-    if validator is None:
-        return
+    def __call__(self, *args, **kwargs):
+        self._validate_inputs(*args, **kwargs)
+        result = self.f(*args, **kwargs)
 
-    if isinstance(validator, type):
-        if not isinstance(val, validator):
-            act_type = type(val).__name__
-            exp_type = validator.__name__
+        if not hasattr(result, "__iter__"):
+            self._validate_outputs(result)
+        else:
+            self._validate_outputs(*result)
 
-            msg = ("Incorrect type for variable '{inp_name}': "
-                   "expected {exp_type} but got {act_type} instead")
-            raise TypeError(msg.format(inp_name=arg,
-                                       exp_type=exp_type,
-                                       act_type=act_type))
-    elif callable(validator):
-        is_valid = validator(val)
+        return result
 
-        if is_valid is False:
-            msg = ("Invalid value for variable "
-                   "'{inp_name}': {val}")
-            raise ValueError(msg.format(inp_name=arg, val=val))
+    @staticmethod
+    def _check_value(arg, val, validator):
+        """
+        Check whether a value provided for an argument is valid.
+
+        Parameters
+        ----------
+        arg : str
+            The name of the argument.
+        val : val
+            The value of the argument.
+        validator : type, callable, or None
+            The method to call to validate the argument OR type to check.
+
+        Raises
+        ------
+        TypeError : the argument had a type mismatch with `validator`
+        ValueError : the `validator` callable failed with `val`
+        """
+
+        if validator is None:
+            return
+
+        if isinstance(validator, type):
+            if not isinstance(val, validator):
+                act_type = type(val).__name__
+                exp_type = validator.__name__
+
+                msg = ("Incorrect type for variable '{inp_name}': "
+                       "expected {exp_type} but got {act_type} instead")
+                raise TypeError(msg.format(inp_name=arg,
+                                           exp_type=exp_type,
+                                           act_type=act_type))
+        elif callable(validator):
+            is_valid = validator(val)
+
+            if is_valid is False:
+                msg = ("Invalid value for variable "
+                       "'{inp_name}': {val}")
+                raise ValueError(msg.format(inp_name=arg, val=val))
+
+    def _validate_inputs(self, *args, **kwargs):
+        for index, val in enumerate(args):
+            # Too many arguments have been provided,
+            # but let Python handle this instead of us.
+            if index >= len(self.var_names):
+                break
+
+            var_name = self.var_names[index]
+
+            if var_name in kwargs:
+                msg = ("{func_name}() got multiple values "
+                       "for argument '{arg_name}'")
+                raise TypeError(msg.format(func_name=self.f.__name__,
+                                           arg_name=var_name))
+
+            index += 1
+
+            validator = self.input_validators.get(var_name)
+            self._check_value(var_name, val, validator)
+
+        for var_name, val in kwargs.items():
+            validator = self.input_validators.get(var_name)
+            self._check_value(var_name, val, validator)
+
+    def _validate_outputs(self, *args):
+        for index, validator in enumerate(self.output_validators):
+            if index >= len(args):
+                break
+
+            val = args[index]
+            var_name = "Output {i}".format(i=index)
+
+            self._check_value(var_name, val, validator)
 
 
 def validate_inputs(**validators):
@@ -61,36 +114,14 @@ def validate_inputs(**validators):
         A function decorator that can be used to validate function inputs.
     """
 
-    def outer_wrapper(f):
-        var_names = f.__code__.co_varnames
+    def wrapper(f):
+        if not isinstance(f, _ValidatedFunction):
+            f = _ValidatedFunction(f)
 
-        @functools.wraps(f)
-        def inner_wrapper(*args, **kwargs):
-            for index, val in enumerate(args):
-                # Too many arguments have been provided,
-                # but let Python handle this instead of us.
-                if index >= len(var_names):
-                    break
+        f.input_validators.update(**validators)
+        return f
 
-                var_name = var_names[index]
-
-                if var_name in kwargs:
-                    msg = ("{func_name}() got multiple values "
-                           "for argument '{arg_name}'")
-                    raise TypeError(msg.format(func_name=f.__name__,
-                                               arg_name=var_name))
-
-                index += 1
-                _check_value(var_name, val, validators.get(var_name))
-
-            for var_name, val in kwargs.items():
-                _check_value(var_name, val, validators.get(var_name))
-
-            return f(*args, **kwargs)
-
-        return inner_wrapper
-
-    return outer_wrapper
+    return wrapper
 
 
 def validate_outputs(*validators):
@@ -111,28 +142,11 @@ def validate_outputs(*validators):
         A function decorator that can be used to validate function outputs.
     """
 
-    def outer_wrapper(f):
+    def wrapper(f):
+        if not isinstance(f, _ValidatedFunction):
+            f = _ValidatedFunction(f)
 
-        @functools.wraps(f)
-        def inner_wrapper(*args, **kwargs):
-            orig_result = f(*args, **kwargs)
+        f.output_validators = f.output_validators + validators
+        return f
 
-            if not hasattr(orig_result, "__iter__"):
-                result = [orig_result]
-            else:
-                result = orig_result[:]
-
-            for index, validator in enumerate(validators):
-                if index >= len(result):
-                    break
-
-                val = result[index]
-                var_name = "Output {i}".format(i=index)
-
-                _check_value(var_name, val, validator)
-
-            return orig_result
-
-        return inner_wrapper
-
-    return outer_wrapper
+    return wrapper
