@@ -98,7 +98,7 @@ def test_invalid_kwargs():
 
 
 def test_invalid_type():
-    matcher = "Incorrect type passed in"
+    matcher = "Incorrect type for variable"
 
     with pytest.raises(TypeError) as exc_info:
         increment(1.5)
@@ -132,7 +132,7 @@ def test_failed_validator():
     with pytest.raises(ValueError) as exc_info:
         operate_only_even(3)
 
-    exc_info.match("Invalid argument value")
+    exc_info.match("Invalid value for variable")
 
     # The validation function itself will fail
     # because the argument has no mod method.

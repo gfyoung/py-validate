@@ -1,5 +1,7 @@
 import functools
 
+__all__ = ["validate_inputs", "validate_outputs"]
+
 
 def _check_value(arg, val, validator):
     if validator is None:
@@ -10,16 +12,17 @@ def _check_value(arg, val, validator):
             act_type = type(val).__name__
             exp_type = validator.__name__
 
-            msg = ("Incorrect type passed in: expected "
-                   "{exp_type} but got {act_type} instead")
-            raise TypeError(msg.format(exp_type=exp_type,
+            msg = ("Incorrect type for variable '{inp_name}': "
+                   "expected {exp_type} but got {act_type} instead")
+            raise TypeError(msg.format(inp_name=arg,
+                                       exp_type=exp_type,
                                        act_type=act_type))
     elif callable(validator):
         is_valid = validator(val)
 
         if is_valid is False:
-            msg = ("Invalid argument value for "
-                   "input '{inp_name}': {val}")
+            msg = ("Invalid value for variable "
+                   "'{inp_name}': {val}")
             raise ValueError(msg.format(inp_name=arg, val=val))
 
 
@@ -57,4 +60,30 @@ def validate_inputs(**validators):
     return outer_wrapper
 
 
-__all__ = ["validate_inputs"]
+def validate_outputs(*validators):
+
+    def outer_wrapper(f):
+
+        @functools.wraps(f)
+        def inner_wrapper(*args, **kwargs):
+            orig_result = f(*args, **kwargs)
+
+            if not hasattr(orig_result, "__iter__"):
+                result = [orig_result]
+            else:
+                result = orig_result[:]
+
+            for index, validator in enumerate(validators):
+                if index >= len(result):
+                    break
+
+                val = result[index]
+                var_name = "Output {i}".format(i=index)
+
+                _check_value(var_name, val, validator)
+
+            return orig_result
+
+        return inner_wrapper
+
+    return outer_wrapper
