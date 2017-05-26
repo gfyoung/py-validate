@@ -6,5 +6,6 @@
 *.iml
 
 # Python files
+*.egg-info
 .cache
 *.pyc
