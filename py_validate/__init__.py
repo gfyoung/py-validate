@@ -3,6 +3,8 @@ from py_validate.validator import *  # noqa
 from subprocess import call
 from os.path import dirname
 
+__version__ = "0.0.1"
+
 
 def test():
     """

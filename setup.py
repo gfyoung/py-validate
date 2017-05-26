@@ -1,8 +1,9 @@
 from setuptools import setup
+from py_validate import __version__ as validate_version
 
 setup(
     name="py_validate",
-    version="0.0.1",
+    version=validate_version,
     packages=["py_validate",
               "py_validate.tests"],
     include_package_data=True,
