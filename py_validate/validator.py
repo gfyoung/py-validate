@@ -15,8 +15,8 @@ class _ValidatedFunction(object):
         self.f = f
         self.var_names = f.__code__.co_varnames
 
-        self.input_validators = {}
-        self.output_validators = tuple()
+        self._input_validators = {}
+        self._output_validators = tuple()
 
     def __call__(self, *args, **kwargs):
         self._validate_inputs(*args, **kwargs)
@@ -28,6 +28,12 @@ class _ValidatedFunction(object):
             self._validate_outputs(*result)
 
         return result
+
+    def update_input_validators(self, **kwargs):
+        self._input_validators.update(**kwargs)
+
+    def update_output_validators(self, *args):
+        self._output_validators = self._output_validators + args
 
     @staticmethod
     def _check_value(arg, val, validator):
@@ -87,15 +93,15 @@ class _ValidatedFunction(object):
 
             index += 1
 
-            validator = self.input_validators.get(var_name)
+            validator = self._input_validators.get(var_name)
             self._check_value(var_name, val, validator)
 
         for var_name, val in kwargs.items():
-            validator = self.input_validators.get(var_name)
+            validator = self._input_validators.get(var_name)
             self._check_value(var_name, val, validator)
 
     def _validate_outputs(self, *args):
-        for index, validator in enumerate(self.output_validators):
+        for index, validator in enumerate(self._output_validators):
             if index >= len(args):
                 break
 
@@ -126,7 +132,7 @@ def validate_inputs(**validators):
         if not isinstance(f, _ValidatedFunction):
             f = _ValidatedFunction(f)
 
-        f.input_validators.update(**validators)
+        f.update_input_validators(**validators)
         return f
 
     return wrapper
@@ -154,7 +160,7 @@ def validate_outputs(*validators):
         if not isinstance(f, _ValidatedFunction):
             f = _ValidatedFunction(f)
 
-        f.output_validators = f.output_validators + validators
+        f.update_output_validators(*validators)
         return f
 
     return wrapper
