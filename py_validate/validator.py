@@ -4,6 +4,24 @@ __all__ = ["validate_inputs", "validate_outputs"]
 
 
 def _check_value(arg, val, validator):
+    """
+    Check whether a value provided for an argument is valid.
+
+    Parameters
+    ----------
+    arg : str
+        The name of the argument.
+    val : val
+        The value of the argument.
+    validator : type, callable, or None
+        The method to call to validate the argument OR type to check against.
+
+    Raises
+    ------
+    TypeError : the argument had a type mismatch with `validator`
+    ValueError : the `validator` callable failed with `val`
+    """
+
     if validator is None:
         return
 
@@ -27,6 +45,21 @@ def _check_value(arg, val, validator):
 
 
 def validate_inputs(**validators):
+    """
+    Wrapper for validating the inputs of a function.
+
+    Parameters
+    ----------
+    validators : kwargs
+        A dictionary mapping argument names to validators. Each validator
+        can either be a type or callable, which be used to check whether
+        the value supplied for that argument is valid.
+
+    Returns
+    -------
+    input_validator_decorator : callable
+        A function decorator that can be used to validate function inputs.
+    """
 
     def outer_wrapper(f):
         var_names = f.__code__.co_varnames
@@ -61,6 +94,22 @@ def validate_inputs(**validators):
 
 
 def validate_outputs(*validators):
+    """
+    Wrapper for validating the outputs of a function.
+
+    Parameters
+    ----------
+    validators : varargs
+        A list of validators to check against arguments returned from a
+        function call. It is assumed that the first validator provided
+        is to check the first returned element, the second validator provided
+        is to check the second returned element, etc.
+
+    Returns
+    -------
+    output_validator_decorator : callable
+        A function decorator that can be used to validate function outputs.
+    """
 
     def outer_wrapper(f):
 
