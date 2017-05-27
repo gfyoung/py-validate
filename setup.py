@@ -17,7 +17,6 @@ setup(
     download_url="https://github.com/gfyoung/py-validate",
     url="https://github.com/gfyoung/py-validate",
     author="G. Young",
-    author_email="None - use the homepage instead!",
     bugtrack_url="https://github.com/gfyoung/py-validate/issues",
     keywords="python validate wrapper function",
     classifiers=[
