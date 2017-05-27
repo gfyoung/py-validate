@@ -25,6 +25,7 @@ class _ValidatedFunction(object):
         self.f = f
         self.var_names = f.__code__.co_varnames
 
+        self._exp_output_len = None
         self._input_validators = {}
         self._output_validators = tuple()
 
@@ -46,6 +47,18 @@ class _ValidatedFunction(object):
             self._validate_outputs(*result)
 
         return result
+
+    def update_exp_output_len(self, exp_output_len):
+        """
+        Update the expected length of the function output.
+
+        Parameters
+        ----------
+        exp_output_len : int
+            The new expected length of the function output.
+        """
+
+        self._exp_output_len = exp_output_len
 
     def update_input_validators(self, **validators):
         """
@@ -82,7 +95,7 @@ class _ValidatedFunction(object):
         ----------
         arg : str
             The name of the argument.
-        val : val
+        val : object
             The value of the argument.
         validator : type, callable, or None
             The method to call to validate the argument OR type to check.
@@ -147,6 +160,13 @@ class _ValidatedFunction(object):
         Validate the outputs of a function.
         """
 
+        if self._exp_output_len is not None:
+            if self._exp_output_len != len(args):
+                raise ValueError(
+                    "Expected {exp_count} items returned but "
+                    "got {act_count}".format(exp_count=self._exp_output_len,
+                                             act_count=len(args)))
+
         for index, validator in enumerate(self._output_validators):
             if index >= len(args):
                 break
@@ -184,12 +204,15 @@ def validate_inputs(**validators):
     return wrapper
 
 
-def validate_outputs(*validators):
+def validate_outputs(exp_len=None, *validators):
     """
     Wrapper for validating the outputs of a function.
 
     Parameters
     ----------
+    exp_len : int
+        The expected number of elements in the result.
+
     validators : varargs
         A list of validators to check against arguments returned from a
         function call. It is assumed that the first validator provided
@@ -206,7 +229,9 @@ def validate_outputs(*validators):
         if not isinstance(f, _ValidatedFunction):
             f = _ValidatedFunction(f)
 
+        f.update_exp_output_len(exp_len)
         f.update_output_validators(*validators)
+
         return f
 
     return wrapper

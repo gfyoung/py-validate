@@ -20,21 +20,33 @@ def sum_numbers_input_override(a, b):
 
 
 @validate_inputs(a=int)
-@validate_outputs(int)
+@validate_outputs(None, int)
 def sum_numbers_input_output(a, b):
     return a + b
 
 
-@validate_outputs(int)
+@validate_outputs(None, int)
 @validate_inputs(a=int)
 def sum_numbers_output_input(a, b):
     return a + b
 
 
-@validate_outputs(int)
-@validate_outputs(float)
+@validate_outputs(None, int)
+@validate_outputs(None, float)
 def op_numbers_two_outputs(a, b):
     return a + 1, b - 1
+
+
+@validate_outputs(3)
+@validate_inputs(a=lambda x: x > 0)
+@validate_outputs(None, lambda x: x % 3 == 0)
+def triple_input_triple_output(a):
+    if a % 3 == 0:
+        return a, a, a
+    elif a % 3 == 1:
+        return a, a - 1, a + 1
+    else:
+        return a
 
 
 def test_valid():
@@ -98,5 +110,28 @@ def test_invalid_type():
 
     with pytest.raises(TypeError) as exc_info:
         op_numbers_two_outputs(1, 1.5)
+
+    exc_info.match(matcher)
+
+
+def test_failed_validator():
+    matcher = "Invalid value for variable"
+
+    with pytest.raises(ValueError) as exc_info:
+        triple_input_triple_output(1)
+
+    exc_info.match(matcher)
+
+    with pytest.raises(ValueError) as exc_info:
+        triple_input_triple_output(-1)
+
+    exc_info.match(matcher)
+
+
+def test_failed_output_len():
+    matcher = "items returned but got"
+
+    with pytest.raises(ValueError) as exc_info:
+        triple_input_triple_output(5)
 
     exc_info.match(matcher)
