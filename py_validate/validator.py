@@ -102,7 +102,8 @@ class _ValidatedFunction(object):
 
         Raises
         ------
-        TypeError : the argument had a type mismatch with `validator`
+        TypeError : the argument had a type mismatch with `validator` OR
+                    the validator was an invalid one for checking
         ValueError : the `validator` callable failed with `val`
         """
 
@@ -126,6 +127,11 @@ class _ValidatedFunction(object):
                 msg = ("Invalid value for variable "
                        "'{inp_name}': {val}")
                 raise ValueError(msg.format(inp_name=arg, val=val))
+
+        else:
+            validator_type = type(validator).__name__
+            raise TypeError("Validator must either be a callable or "
+                            "type, not {v_type}".format(v_type=validator_type))
 
     def _validate_inputs(self, *args, **kwargs):
         """

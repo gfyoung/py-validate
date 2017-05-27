@@ -49,6 +49,18 @@ def triple_input_triple_output(a):
         return a
 
 
+@validate_inputs(a=1)
+@validate_outputs(1, int)
+def operate_invalid_input_check(a):
+    return a - 1
+
+
+@validate_inputs(a=int)
+@validate_outputs(1, 1)
+def operate_invalid_output_check(a):
+    return a - 1
+
+
 def test_valid():
     assert sum_numbers(1, 2) == 3
     assert sum_numbers_input_output(1, 2) == 3
@@ -58,6 +70,18 @@ def test_valid():
 
 
 def test_invalid_type():
+    matcher = "Validator must either be a callable or type"
+
+    with pytest.raises(TypeError) as exc_info:
+        operate_invalid_input_check(1)
+
+    exc_info.match(matcher)
+
+    with pytest.raises(TypeError) as exc_info:
+        operate_invalid_output_check(1)
+
+    exc_info.match(matcher)
+
     matcher = "Incorrect type for variable"
 
     with pytest.raises(TypeError) as exc_info:

@@ -38,6 +38,11 @@ def triple_input_triple_output(a):
         return a
 
 
+@validate_outputs(None, 2)
+def operate_invalid_check(a):
+    return a + 1
+
+
 def test_valid():
     # The types are correct.
     assert halve_input(2) == 1
@@ -50,6 +55,13 @@ def test_valid():
 
 
 def test_invalid_type():
+    matcher = "Validator must either be a callable or type"
+
+    with pytest.raises(TypeError) as exc_info:
+        operate_invalid_check(1)
+
+    exc_info.match(matcher)
+
     matcher = "Incorrect type for variable"
 
     with pytest.raises(TypeError) as exc_info:

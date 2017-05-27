@@ -46,6 +46,11 @@ def operate_only_odd(a):
     return ((a - 1) / 2) - 5
 
 
+@validate_inputs(a=2)
+def operate_invalid_check(a):
+    return a + 1
+
+
 def test_valid():
     # The types are correct.
     assert increment(1) == 2
@@ -98,6 +103,13 @@ def test_invalid_kwargs():
 
 
 def test_invalid_type():
+    matcher = "Validator must either be a callable or type"
+
+    with pytest.raises(TypeError) as exc_info:
+        operate_invalid_check(1)
+
+    exc_info.match(matcher)
+
     matcher = "Incorrect type for variable"
 
     with pytest.raises(TypeError) as exc_info:
