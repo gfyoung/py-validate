@@ -8,5 +8,6 @@
 # Python files
 *.egg-info
 .cache
+build/
 *.pyc
 dist

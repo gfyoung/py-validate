@@ -22,12 +22,42 @@ class _ValidatedFunction(object):
             we are not passing in another _ValidatedFunction instance.
         """
 
-        self.f = f
+        self.f = self._validate_callable(f)
         self.var_names = f.__code__.co_varnames
 
         self._exp_output_len = None
         self._input_validators = {}
         self._output_validators = tuple()
+
+    @staticmethod
+    def _validate_callable(f):
+        """
+        Validate the callable parameter to `_ValidatedFunction`
+
+        Parameters
+        ----------
+        f : callable
+            The callable parameter that we wish to validate.
+
+        Returns
+        -------
+        orig_f : callable
+            The original callable parameter if it is valid.
+
+        Raises
+        ------
+        TypeError : the callable input is invalid.
+        """
+
+        msg = "Invalid function parameter provided"
+
+        valid_callable = callable(f) and hasattr(f, "__code__")
+        valid_callable = valid_callable and hasattr(f.__code__, "co_varnames")
+
+        if not valid_callable:
+            raise ValueError(msg)
+
+        return f
 
     def __call__(self, *args, **kwargs):
         """
