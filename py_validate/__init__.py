@@ -11,5 +11,11 @@ def test():
     Run unit tests on the current py_validate installation.
     """
 
+    try:
+        import pytest  # noqa
+    except ImportError:
+        raise ImportError("pytest not found. Please install "
+                          "with `pip install pytest`")
+
     directory = dirname(__file__)
     call(["pytest", directory])
