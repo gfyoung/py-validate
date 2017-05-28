@@ -5,6 +5,11 @@ from os.path import dirname
 
 __version__ = "0.0.1"
 
+__doc__ = """
+py_validate - Easy-to-use, customizable function validator wrappers in
+Python that can be used to check both inputs and outputs of functions.
+"""
+
 
 def test():
     """
