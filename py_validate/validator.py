@@ -88,6 +88,9 @@ class _ValidatedFunction(object):
             The new expected length of the function output.
         """
 
+        if not (exp_output_len is None or isinstance(exp_output_len, int)):
+            raise TypeError("Expected an integer for expected output length")
+
         self._exp_output_len = exp_output_len
 
     def update_input_validators(self, **validators):

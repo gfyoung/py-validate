@@ -46,3 +46,13 @@ def test_input_wrong_callable():
         _ValidatedFunction(CallableClassNoCoVarnames())
 
     exc_info.match(matcher)
+
+
+def test_input_bad_exp_len():
+    validator = _ValidatedFunction(lambda x: x + 1)
+    matcher = "Expected an integer for expected output length"
+
+    with pytest.raises(TypeError) as exc_info:
+        validator.update_exp_output_len("foo")
+
+    exc_info.match(matcher)
