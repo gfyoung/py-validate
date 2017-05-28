@@ -1,3 +1,7 @@
+"""
+Unittests for the input validator decorator.
+"""
+
 from py_validate.validator import validate_inputs
 
 import pytest

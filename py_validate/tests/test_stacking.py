@@ -1,5 +1,6 @@
 """
-Integration tests for the decorators.
+Stacking tests for the decorators i.e. how functions behave when start
+applying more than one of these decorators to a function.
 """
 
 from py_validate.validator import validate_inputs, validate_outputs

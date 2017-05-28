@@ -1,3 +1,7 @@
+"""
+Unittests for fuzzy inputs to the `_ValidatedFunction` class.
+"""
+
 from py_validate.validator import _ValidatedFunction
 
 import pytest

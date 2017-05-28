@@ -1,3 +1,7 @@
+"""
+Unittests for the output validator decorator.
+"""
+
 from py_validate.validator import validate_outputs
 
 import pytest
