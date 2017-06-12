@@ -3,7 +3,7 @@ from py_validate.validator import *  # noqa
 from subprocess import call
 from os.path import dirname
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 __doc__ = """
 py_validate - Easy-to-use, customizable function validator wrappers in
