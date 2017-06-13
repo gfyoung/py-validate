@@ -62,8 +62,15 @@ def operate_invalid_output_check(a):
     return a - 1
 
 
+@validate_inputs(a="number")
+@validate_inputs(b="number")
+def operate_invalid_numbers(a, b):
+    return a + b
+
+
 def test_valid():
     assert sum_numbers(1, 2) == 3
+    assert operate_invalid_numbers(1, 2) == 3
     assert sum_numbers_input_output(1, 2) == 3
     assert sum_numbers_output_input(1, 2) == 3
     assert sum_numbers_input_override(1.5, 1) == 2.5
@@ -135,6 +142,23 @@ def test_invalid_type():
 
     with pytest.raises(TypeError) as exc_info:
         op_numbers_two_outputs(1, 1.5)
+
+    exc_info.match(matcher)
+
+    matcher = "Expected a number but got"
+
+    with pytest.raises(TypeError) as exc_info:
+        operate_invalid_numbers(1, "foo")
+
+    exc_info.match(matcher)
+
+    with pytest.raises(TypeError) as exc_info:
+        operate_invalid_numbers("foo", 1)
+
+    exc_info.match(matcher)
+
+    with pytest.raises(TypeError) as exc_info:
+        operate_invalid_numbers("foo", "bar")
 
     exc_info.match(matcher)
 

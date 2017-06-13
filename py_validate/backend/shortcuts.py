@@ -23,5 +23,5 @@ def check_number(x):
 
 
 mappings = {
-    "integer": check_number
+    "number": check_number
 }

@@ -2,6 +2,8 @@
 Base class that underlies the validation wrappers for input and output.
 """
 
+from .shortcuts import mappings
+
 
 class ValidatedFunction(object):
 
@@ -124,8 +126,16 @@ class ValidatedFunction(object):
             The name of the argument.
         val : object
             The value of the argument.
-        validator : type, callable, or None
-            The method to call to validate the argument OR type to check.
+        validator : str, type, callable, or None
+            The method by which to validate the argument. If a string is
+            provided, that means we are using a shortcut, which is a callable
+            that returns None and raises TypeError if the validation fails.
+
+            If a type is provided, we check if the variable is an instance
+            of that type, and we raise a TypeError if there is a type mismatch.
+
+            If a callable is provided, we expect the variable to return True
+            if the check passes and raise OR return False if the check fails.
 
         Raises
         ------
@@ -137,7 +147,16 @@ class ValidatedFunction(object):
         if validator is None:
             return
 
-        if isinstance(validator, type):
+        if isinstance(validator, str):
+            msg = "Unknown shortcut: '{shortcut}'".format(shortcut=validator)
+            validator = mappings.get(validator)
+
+            if validator is not None:
+                validator(val)
+            else:
+                raise ValueError(msg)
+
+        elif isinstance(validator, type):
             if not isinstance(val, validator):
                 act_type = type(val).__name__
                 exp_type = validator.__name__

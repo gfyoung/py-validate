@@ -55,6 +55,11 @@ def operate_invalid_check(a):
     return a + 1
 
 
+@validate_inputs(a="number")
+def increment_number(a):
+    return a + 1
+
+
 def test_valid():
     # The types are correct.
     assert increment(1) == 2
@@ -71,6 +76,10 @@ def test_valid():
     # These kwargs tests shouldn't raise.
     assert operate_kwargs(1) == 2
     assert operate_kwargs(1, b=5, c=2) == 0
+
+    # These shortcut tests shouldn't rise.
+    assert increment_number(1) == 2
+    assert increment_number(1.5) == 2.5
 
 
 def test_wrong_number_of_args():
@@ -142,6 +151,11 @@ def test_invalid_type():
         increment_no_match("foo")
 
     exc_info.match("unsupported operand type")
+
+    with pytest.raises(TypeError) as exc_info:
+        increment_number("foo")
+
+    exc_info.match("Expected a number but got")
 
 
 def test_failed_validator():

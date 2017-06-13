@@ -47,9 +47,15 @@ def operate_invalid_check(a):
     return a + 1
 
 
+@validate_outputs(None, "number")
+def operate_invalid_number(a):
+    return a * 5
+
+
 def test_valid():
     # The types are correct.
     assert halve_input(2) == 1
+    assert operate_invalid_number(5) == 25
 
     # These should pass validation.
     assert triple_quadruple_input(2) == (6, 8)
@@ -70,6 +76,13 @@ def test_invalid_type():
 
     with pytest.raises(TypeError) as exc_info:
         halve_input(1)
+
+    exc_info.match(matcher)
+
+    matcher = "Expected a number but got"
+
+    with pytest.raises(TypeError) as exc_info:
+        operate_invalid_number("a")
 
     exc_info.match(matcher)
 
