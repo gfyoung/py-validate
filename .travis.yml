@@ -7,16 +7,29 @@ sudo: false
 
 cache:
   directories:
+    - $HOME/miniconda3
     - $HOME/.cache/pip
 
-python:
-  - "2.7"
-  - "3.5"
-  - "3.6"
+before_cache:
+  - rm -rf $HOME/miniconda3/envs/validate
+
+matrix:
+  fast_finish: true
+  include:
+    - os: linux
+      env: PYTHON_VERSION="2.7"
+    - os: linux
+      env: PYTHON_VERSION="3.5"
+    - os: linux
+      env: PYTHON_VERSION="3.6"
+
+before_install:
+  - export PATH="$HOME/miniconda3/bin:$PATH"
 
 install:
-  - pip install flake8 pytest -U
+  - ci/install_conda.sh
+  - ci/install_conda_env.sh
 
 script:
-  - pytest
-  - flake8
+  - ci/test_repo.sh
+  - ci/lint_repo.sh
