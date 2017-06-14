@@ -68,8 +68,20 @@ def operate_invalid_numbers(a, b):
     return a + b
 
 
+@validate_inputs(a="integer")
+@validate_outputs(1, int)
+def operate_integer_in_out(a):
+    if a == 0:
+        return 0.5
+    elif a == 1:
+        return 1, 1
+    else:
+        return a + 1
+
+
 def test_valid():
     assert sum_numbers(1, 2) == 3
+    assert operate_integer_in_out(2) == 3
     assert operate_invalid_numbers(1, 2) == 3
     assert sum_numbers_input_output(1, 2) == 3
     assert sum_numbers_output_input(1, 2) == 3
@@ -78,7 +90,7 @@ def test_valid():
 
 
 def test_invalid_type():
-    matcher = "Validator must either be a callable or type"
+    matcher = "Validator must either be a shortcut, callable, or type"
 
     with pytest.raises(TypeError) as exc_info:
         operate_invalid_input_check(1)
@@ -145,6 +157,11 @@ def test_invalid_type():
 
     exc_info.match(matcher)
 
+    with pytest.raises(TypeError) as exc_info:
+        operate_integer_in_out(0)
+
+    exc_info.match(matcher)
+
     matcher = "Expected a number but got"
 
     with pytest.raises(TypeError) as exc_info:
@@ -159,6 +176,13 @@ def test_invalid_type():
 
     with pytest.raises(TypeError) as exc_info:
         operate_invalid_numbers("foo", "bar")
+
+    exc_info.match(matcher)
+
+    matcher = "Expected an integer but got"
+
+    with pytest.raises(TypeError) as exc_info:
+        operate_integer_in_out(1.5)
 
     exc_info.match(matcher)
 
@@ -182,5 +206,10 @@ def test_failed_output_len():
 
     with pytest.raises(ValueError) as exc_info:
         triple_input_triple_output(5)
+
+    exc_info.match(matcher)
+
+    with pytest.raises(ValueError) as exc_info:
+        operate_integer_in_out(1)
 
     exc_info.match(matcher)

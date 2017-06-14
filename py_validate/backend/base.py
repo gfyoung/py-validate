@@ -131,6 +131,14 @@ class ValidatedFunction(object):
             provided, that means we are using a shortcut, which is a callable
             that returns None and raises TypeError if the validation fails.
 
+            If an invalid shortcut is provided, a TypeError will also be
+            raised. Currently, valid shortcuts are:
+
+            1) number - The input must be a number.
+            2) integer - The input must be an integer. This means that type
+                         of the input must be integral. Thus, "1.0" will fail
+                         this check even though it is equal to an integer.
+
             If a type is provided, we check if the variable is an instance
             of that type, and we raise a TypeError if there is a type mismatch.
 
@@ -176,8 +184,9 @@ class ValidatedFunction(object):
 
         else:
             validator_type = type(validator).__name__
-            raise TypeError("Validator must either be a callable or "
-                            "type, not {v_type}".format(v_type=validator_type))
+            raise TypeError("Validator must either be a shortcut, "
+                            "callable, or type, not {v_type}"
+                            .format(v_type=validator_type))
 
     def _validate_inputs(self, *args, **kwargs):
         """

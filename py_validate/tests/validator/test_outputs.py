@@ -65,7 +65,7 @@ def test_valid():
 
 
 def test_invalid_type():
-    matcher = "Validator must either be a callable or type"
+    matcher = "Validator must either be a shortcut, callable, or type"
 
     with pytest.raises(TypeError) as exc_info:
         operate_invalid_check(1)

@@ -94,3 +94,17 @@ TypeError: Incorrect type for variable 'b': expected float but got int instead
 ...
 TypeError: Incorrect type for variable 'Output 0': expected int but got float instead
 ~~~
+
+This library also comes with some shortcuts that can make it easier to write verification checks:
+
+~~~python
+import py_validate as pv
+
+@pv.validate_inputs(a="number")
+def increment_input(a):
+    return a + 1
+
+>>> increment_input("foo")
+...
+TypeError: Expected a number but got: 'str'
+~~~

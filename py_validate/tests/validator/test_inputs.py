@@ -60,6 +60,11 @@ def increment_number(a):
     return a + 1
 
 
+@validate_inputs(a="integer")
+def decrement_number(a):
+    return a - 1
+
+
 def test_valid():
     # The types are correct.
     assert increment(1) == 2
@@ -80,6 +85,9 @@ def test_valid():
     # These shortcut tests shouldn't rise.
     assert increment_number(1) == 2
     assert increment_number(1.5) == 2.5
+
+    assert decrement_number(1) == 0
+    assert decrement_number(10) == 9
 
 
 def test_wrong_number_of_args():
@@ -116,7 +124,7 @@ def test_invalid_kwargs():
 
 
 def test_invalid_type():
-    matcher = "Validator must either be a callable or type"
+    matcher = "Validator must either be a shortcut, callable, or type"
 
     with pytest.raises(TypeError) as exc_info:
         operate_invalid_check(1)
@@ -156,6 +164,11 @@ def test_invalid_type():
         increment_number("foo")
 
     exc_info.match("Expected a number but got")
+
+    with pytest.raises(TypeError) as exc_info:
+        decrement_number(1.5)
+
+    exc_info.match("Expected an integer but got")
 
 
 def test_failed_validator():
