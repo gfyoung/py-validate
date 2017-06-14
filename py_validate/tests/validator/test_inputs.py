@@ -3,8 +3,8 @@ Unittests for the input validator decorator.
 """
 
 from py_validate.validator import validate_inputs
+from py_validate.tests import assert_raises
 
-import pytest
 import sys
 
 
@@ -94,97 +94,53 @@ def test_wrong_number_of_args():
     # We expect Python to handle this for us.
     py3 = sys.version_info >= (3, 0)
 
-    with pytest.raises(TypeError) as exc_info:
-        increment(1, 1.5)
+    msg = ("takes 1 positional argument" if py3
+           else "takes exactly 1 argument")
 
-    if py3:
-        matcher = "takes 1 positional argument"
-    else:  # Python 2.x
-        matcher = "takes exactly 1 argument"
+    assert_raises(TypeError, msg, increment, 1, 1.5)
 
-    exc_info.match(matcher)
+    msg = ("missing 1 required positional argument" if py3
+           else "takes exactly 1 argument")
 
-    with pytest.raises(TypeError) as exc_info:
-        increment()
-
-    if py3:
-        matcher = "missing 1 required positional argument"
-    else:  # Python 2.x
-        matcher = "takes exactly 1 argument"
-
-    exc_info.match(matcher)
+    assert_raises(TypeError, msg, increment)
 
 
 def test_invalid_kwargs():
     # We expect Python to handle this for us.
-    with pytest.raises(TypeError) as exc_info:
-        operate_kwargs(1, a=1)
-
-    exc_info.match("got multiple values for argument")
+    msg = "got multiple values for argument"
+    assert_raises(TypeError, msg, operate_kwargs, 1, a=1)
 
 
 def test_invalid_type():
-    matcher = "Validator must either be a shortcut, callable, or type"
+    msg = "Validator must either be a shortcut, callable, or type"
+    assert_raises(TypeError, msg, operate_invalid_check, 1)
 
-    with pytest.raises(TypeError) as exc_info:
-        operate_invalid_check(1)
-
-    exc_info.match(matcher)
-
-    matcher = "Incorrect type for variable"
-
-    with pytest.raises(TypeError) as exc_info:
-        increment(1.5)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(TypeError) as exc_info:
-        operate_only_odd(1.5)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(TypeError) as exc_info:
-        operate_var_args("foo", 1, 2)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(TypeError) as exc_info:
-        operate_kwargs(a="foo", b=5)
-
-    exc_info.match(matcher)
+    msg = "Incorrect type for variable"
+    assert_raises(TypeError, msg, increment, 1.5)
+    assert_raises(TypeError, msg, operate_only_odd, 1.5)
+    assert_raises(TypeError, msg, operate_var_args, "foo", 1, 2)
+    assert_raises(TypeError, msg, operate_kwargs, a="foo", b=5)
 
     # No argument matches, so raise whatever
     # error Python is raising natively.
-    with pytest.raises(TypeError) as exc_info:
-        increment_no_match("foo")
+    msg = "unsupported operand type"
+    assert_raises(TypeError, msg, increment_no_match, "foo")
 
-    exc_info.match("unsupported operand type")
+    msg = "Expected a number but got"
+    assert_raises(TypeError, msg, increment_number, "foo")
 
-    with pytest.raises(TypeError) as exc_info:
-        increment_number("foo")
-
-    exc_info.match("Expected a number but got")
-
-    with pytest.raises(TypeError) as exc_info:
-        decrement_number(1.5)
-
-    exc_info.match("Expected an integer but got")
+    msg = "Expected an integer but got"
+    assert_raises(TypeError, msg, decrement_number, "foo")
 
 
 def test_failed_validator():
-    with pytest.raises(ValueError) as exc_info:
-        operate_only_even(3)
-
-    exc_info.match("Invalid value for variable")
+    msg = "Invalid value for variable"
+    assert_raises(ValueError, msg, operate_only_even, 3)
 
     # The validation function itself will fail
     # because the argument has no mod method.
-    with pytest.raises(TypeError) as exc_info:
-        operate_only_even(tuple())
+    msg = "unsupported operand type"
+    assert_raises(TypeError, msg, operate_only_even, tuple())
 
-    exc_info.match("unsupported operand type")
-
-    with pytest.raises(ValueError) as exc_info:
-        operate_only_odd(2)
-
-    exc_info.match("Odd number expected")
+    msg = "Odd number expected"
+    assert_raises(ValueError, msg, operate_only_odd, 2)

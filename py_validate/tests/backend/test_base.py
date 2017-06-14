@@ -3,60 +3,42 @@ Unittests for fuzzy inputs to the `_ValidatedFunction` class.
 """
 
 from py_validate.backend import ValidatedFunction
+from py_validate.tests import assert_raises
 
 import pytest
 
 
-def test_input_not_callable():
-    matcher = "Invalid function parameter provided"
-
-    with pytest.raises(ValueError) as exc_info:
-        ValidatedFunction(2)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(ValueError) as exc_info:
-        ValidatedFunction([1, 2, 3])
-
-    exc_info.match(matcher)
-
-    with pytest.raises(ValueError) as exc_info:
-        ValidatedFunction({1: 2, 4: 5})
-
-    exc_info.match(matcher)
+@pytest.mark.parametrize("invalid", [
+    2, [1, 2, 3], {1: 2, 4: 5}
+])
+def test_input_not_callable(invalid):
+    msg = "Invalid function parameter provided"
+    assert_raises(ValueError, msg, ValidatedFunction, invalid)
 
 
-def test_input_wrong_callable():
-    matcher = "Invalid function parameter provided"
+class CallableClassNoCode(object):
+    def __call__(self):
+        pass
 
-    class CallableClassNoCode(object):
-        def __call__(self):
-            pass
 
-    with pytest.raises(ValueError) as exc_info:
-        ValidatedFunction(CallableClassNoCode())
+class CallableClassNoCoVarnames(object):
+    def __call__(self):
+        pass
 
-    exc_info.match(matcher)
+    @property
+    def __code__(self):
+        return "foo"
 
-    class CallableClassNoCoVarnames(object):
-        def __call__(self):
-            pass
 
-        @property
-        def __code__(self):
-            return "foo"
-
-    with pytest.raises(ValueError) as exc_info:
-        ValidatedFunction(CallableClassNoCoVarnames())
-
-    exc_info.match(matcher)
+@pytest.mark.parametrize("klass", [
+    CallableClassNoCode, CallableClassNoCoVarnames
+])
+def test_input_wrong_callable(klass):
+    msg = "Invalid function parameter provided"
+    assert_raises(ValueError, msg, ValidatedFunction, klass())
 
 
 def test_input_bad_exp_len():
     validator = ValidatedFunction(lambda x: x + 1)
-    matcher = "Expected an integer for expected output length"
-
-    with pytest.raises(TypeError) as exc_info:
-        validator.update_exp_output_len("foo")
-
-    exc_info.match(matcher)
+    msg = "Expected an integer for expected output length"
+    assert_raises(TypeError, msg, validator.update_exp_output_len, "foo")

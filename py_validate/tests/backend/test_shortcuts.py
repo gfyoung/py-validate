@@ -1,4 +1,5 @@
 import py_validate.backend.shortcuts as shortcuts
+from py_validate.tests import assert_raises
 
 import pytest
 
@@ -16,11 +17,7 @@ class TestCheckNumber(object):
     ])
     def test_invalid_number(self, invalid):
         msg = "Expected a number but got"
-
-        with pytest.raises(TypeError) as exc_info:
-            shortcuts.check_number(invalid)
-
-        exc_info.match(msg)
+        assert_raises(TypeError, msg, shortcuts.check_number, invalid)
 
     def test_numpy_dtypes(self):
         np = pytest.importorskip("numpy")
@@ -46,11 +43,7 @@ class TestCheckInteger(object):
     ])
     def test_invalid_integer(self, invalid):
         msg = "Expected an integer but got"
-
-        with pytest.raises(TypeError) as exc_info:
-            shortcuts.check_integer(invalid)
-
-        exc_info.match(msg)
+        assert_raises(TypeError, msg, shortcuts.check_integer, invalid)
 
     def test_numpy_dtypes(self):
         np = pytest.importorskip("numpy")
@@ -69,8 +62,4 @@ class TestCheckInteger(object):
 
         for dtype in dtypes:
             dtype = np.dtype(dtype).type
-
-            with pytest.raises(TypeError) as exc_info:
-                shortcuts.check_integer(dtype(1))
-
-            exc_info.match(msg)
+            assert_raises(TypeError, msg, shortcuts.check_integer, dtype(1))

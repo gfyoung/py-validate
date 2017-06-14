@@ -4,8 +4,7 @@ applying more than one of these decorators to a function.
 """
 
 from py_validate.validator import validate_inputs, validate_outputs
-
-import pytest
+from py_validate.tests import assert_raises
 
 
 @validate_inputs(a=int)
@@ -90,126 +89,45 @@ def test_valid():
 
 
 def test_invalid_type():
-    matcher = "Validator must either be a shortcut, callable, or type"
+    msg = "Validator must either be a shortcut, callable, or type"
+    assert_raises(TypeError, msg, operate_invalid_input_check, 1)
+    assert_raises(TypeError, msg, operate_invalid_output_check, 1)
 
-    with pytest.raises(TypeError) as exc_info:
-        operate_invalid_input_check(1)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(TypeError) as exc_info:
-        operate_invalid_output_check(1)
-
-    exc_info.match(matcher)
-
-    matcher = "Incorrect type for variable"
-
-    with pytest.raises(TypeError) as exc_info:
-        sum_numbers(1.5, 1)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(TypeError) as exc_info:
-        sum_numbers(1, 1.5)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(TypeError) as exc_info:
-        sum_numbers(1.5, 2.5)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(TypeError) as exc_info:
-        sum_numbers_input_output(1.5, 1.5)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(TypeError) as exc_info:
-        sum_numbers_output_input(1.5, 1.5)
-
-    exc_info.match(matcher)
+    msg = "Incorrect type for variable"
+    assert_raises(TypeError, msg, sum_numbers, 1.5, 1)
+    assert_raises(TypeError, msg, sum_numbers, 1, 1.5)
+    assert_raises(TypeError, msg, sum_numbers, 1.5, 2.5)
+    assert_raises(TypeError, msg, sum_numbers_input_output, 1.5, 1.5)
+    assert_raises(TypeError, msg, sum_numbers_output_input, 1.5, 1.5)
 
     # Float is now the expected type for
     # the first argument to the function.
-    with pytest.raises(TypeError) as exc_info:
-        sum_numbers_input_override(1, 2)
-
-    exc_info.match(matcher)
+    assert_raises(TypeError, msg, sum_numbers_input_override, 1, 2)
 
     # Output type check should fail.
-    with pytest.raises(TypeError) as exc_info:
-        sum_numbers_input_output(1, 1.5)
+    assert_raises(TypeError, msg, sum_numbers_input_output, 1, 1.5)
+    assert_raises(TypeError, msg, sum_numbers_output_input, 1, 1.5)
 
-    exc_info.match(matcher)
+    assert_raises(TypeError, msg, operate_integer_in_out, 0)
+    assert_raises(TypeError, msg, op_numbers_two_outputs, 1, 2)
+    assert_raises(TypeError, msg, op_numbers_two_outputs, 1, 1.5)
 
-    with pytest.raises(TypeError) as exc_info:
-        sum_numbers_output_input(1, 1.5)
+    msg = "Expected a number but got"
+    assert_raises(TypeError, msg, operate_invalid_numbers, 1, "foo")
+    assert_raises(TypeError, msg, operate_invalid_numbers, "foo", 1)
+    assert_raises(TypeError, msg, operate_invalid_numbers, "foo", "bar")
 
-    exc_info.match(matcher)
-
-    with pytest.raises(TypeError) as exc_info:
-        op_numbers_two_outputs(1, 2)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(TypeError) as exc_info:
-        op_numbers_two_outputs(1, 1.5)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(TypeError) as exc_info:
-        operate_integer_in_out(0)
-
-    exc_info.match(matcher)
-
-    matcher = "Expected a number but got"
-
-    with pytest.raises(TypeError) as exc_info:
-        operate_invalid_numbers(1, "foo")
-
-    exc_info.match(matcher)
-
-    with pytest.raises(TypeError) as exc_info:
-        operate_invalid_numbers("foo", 1)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(TypeError) as exc_info:
-        operate_invalid_numbers("foo", "bar")
-
-    exc_info.match(matcher)
-
-    matcher = "Expected an integer but got"
-
-    with pytest.raises(TypeError) as exc_info:
-        operate_integer_in_out(1.5)
-
-    exc_info.match(matcher)
+    msg = "Expected an integer but got"
+    assert_raises(TypeError, msg, operate_integer_in_out, 1.5)
 
 
 def test_failed_validator():
-    matcher = "Invalid value for variable"
-
-    with pytest.raises(ValueError) as exc_info:
-        triple_input_triple_output(1)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(ValueError) as exc_info:
-        triple_input_triple_output(-1)
-
-    exc_info.match(matcher)
+    msg = "Invalid value for variable"
+    assert_raises(ValueError, msg, triple_input_triple_output, 1)
+    assert_raises(ValueError, msg, triple_input_triple_output, -1)
 
 
 def test_failed_output_len():
-    matcher = "items returned but got"
-
-    with pytest.raises(ValueError) as exc_info:
-        triple_input_triple_output(5)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(ValueError) as exc_info:
-        operate_integer_in_out(1)
-
-    exc_info.match(matcher)
+    msg = "items returned but got"
+    assert_raises(ValueError, msg, operate_integer_in_out, 1)
+    assert_raises(ValueError, msg, triple_input_triple_output, 5)

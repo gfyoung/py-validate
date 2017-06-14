@@ -3,8 +3,7 @@ Unittests for the output validator decorator.
 """
 
 from py_validate.validator import validate_outputs
-
-import pytest
+from py_validate.tests import assert_raises
 
 
 @validate_outputs(None, int)
@@ -52,10 +51,19 @@ def operate_invalid_number(a):
     return a * 5
 
 
+@validate_outputs(2, "integer")
+def operate_invalid_integer(a):
+    if a % 2 == 0:
+        return 1 if a == 2 else (a, a)
+    else:
+        return float(a), float(a)
+
+
 def test_valid():
     # The types are correct.
     assert halve_input(2) == 1
     assert operate_invalid_number(5) == 25
+    assert operate_invalid_integer(4) == (4, 4)
 
     # These should pass validation.
     assert triple_quadruple_input(2) == (6, 8)
@@ -65,46 +73,26 @@ def test_valid():
 
 
 def test_invalid_type():
-    matcher = "Validator must either be a shortcut, callable, or type"
+    msg = "Validator must either be a shortcut, callable, or type"
+    assert_raises(TypeError, msg, operate_invalid_check, 1)
 
-    with pytest.raises(TypeError) as exc_info:
-        operate_invalid_check(1)
+    msg = "Incorrect type for variable"
+    assert_raises(TypeError, msg, halve_input, 1)
 
-    exc_info.match(matcher)
+    msg = "Expected a number but got"
+    assert_raises(TypeError, msg, operate_invalid_number, "a")
 
-    matcher = "Incorrect type for variable"
-
-    with pytest.raises(TypeError) as exc_info:
-        halve_input(1)
-
-    exc_info.match(matcher)
-
-    matcher = "Expected a number but got"
-
-    with pytest.raises(TypeError) as exc_info:
-        operate_invalid_number("a")
-
-    exc_info.match(matcher)
+    msg = "Expected an integer but got"
+    assert_raises(TypeError, msg, operate_invalid_integer, 1)
 
 
 def test_failed_validator():
-    matcher = "Invalid value for variable"
-
-    with pytest.raises(ValueError) as exc_info:
-        triple_quadruple_input(1)
-
-    exc_info.match(matcher)
-
-    with pytest.raises(ValueError) as exc_info:
-        triple_input_triple_output(4)
-
-    exc_info.match(matcher)
+    msg = "Invalid value for variable"
+    assert_raises(ValueError, msg, triple_quadruple_input, 1)
+    assert_raises(ValueError, msg, triple_input_triple_output, 4)
 
 
 def test_failed_output_len():
-    matcher = "items returned but got"
-
-    with pytest.raises(ValueError) as exc_info:
-        triple_input_triple_output(5)
-
-    exc_info.match(matcher)
+    msg = "items returned but got"
+    assert_raises(ValueError, msg, operate_invalid_integer, 2)
+    assert_raises(ValueError, msg, triple_input_triple_output, 5)
