@@ -11,6 +11,7 @@ cache:
     - $HOME/.cache/pip
 
 before_cache:
+  - rm -rf $HOME/miniconda3/pkgs/cache
   - rm -rf $HOME/miniconda3/envs/validate
 
 matrix:
