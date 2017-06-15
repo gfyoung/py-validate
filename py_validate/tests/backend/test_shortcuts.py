@@ -63,3 +63,26 @@ class TestCheckInteger(object):
         for dtype in dtypes:
             dtype = np.dtype(dtype).type
             assert_raises(TypeError, msg, shortcuts.check_integer, dtype(1))
+
+
+class TestCheckEven(object):
+
+    @pytest.mark.parametrize("valid", [
+        2, 4, 6, -10, 14, 100
+    ])
+    def test_valid_even(self, valid):
+        shortcuts.check_even(valid)
+
+    @pytest.mark.parametrize("invalid", [
+        1.5, -2.0, [1, 2], "foo", (1, 2), True
+    ])
+    def test_invalid_even_not_int(self, invalid):
+        msg = "Expected an integer but got"
+        assert_raises(TypeError, msg, shortcuts.check_even, invalid)
+
+    @pytest.mark.parametrize("invalid", [
+        1, -1, 3, 11, 101, 7, 3
+    ])
+    def test_invalid_even_not_even(self, invalid):
+        msg = "Expected an even integer"
+        assert_raises(ValueError, msg, shortcuts.check_even, invalid)

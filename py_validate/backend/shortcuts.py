@@ -43,7 +43,28 @@ def check_integer(x):
         raise TypeError(msg)
 
 
+def check_even(x):
+    """
+    Check if a variable is an even number.
+
+    Parameters
+    ----------
+    x : object
+        The variable to check.
+
+    Raises
+    ------
+    TypeError : the variable was not an even number.
+    """
+
+    check_integer(x)
+
+    if x % 2 != 0:
+        raise ValueError("Expected an even integer")
+
+
 mappings = {
+    "even": check_even,
     "number": check_number,
     "integer": check_integer,
 }

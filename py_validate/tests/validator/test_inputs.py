@@ -23,6 +23,11 @@ def operate_only_even(a):
     return (a / 2) - 5
 
 
+@validate_inputs(a="even")
+def operate_only_even_two(a):
+    return (a / 2) - 5
+
+
 @validate_inputs(a=int)
 def operate_var_args(a, *args):
     if len(args) > 1:
@@ -73,6 +78,7 @@ def test_valid():
     # These should pass validation.
     assert operate_only_even(2) == -4
     assert increment_no_match(5) == 4
+    assert operate_only_even_two(2) == -4
 
     # These var-args tests shouldn't raise.
     assert operate_var_args(1, 5) == 2
@@ -131,6 +137,10 @@ def test_invalid_type():
 
     msg = "Expected an integer but got"
     assert_raises(TypeError, msg, decrement_number, "foo")
+    assert_raises(TypeError, msg, operate_only_even_two, "foo")
+
+    msg = "Expected an even integer"
+    assert_raises(ValueError, msg, operate_only_even_two, 1)
 
 
 def test_failed_validator():

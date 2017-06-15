@@ -1,6 +1,6 @@
 """
-Stacking tests for the decorators i.e. how functions behave when start
-applying more than one of these decorators to a function.
+Stacking tests for the decorators i.e. how functions behave when
+we start applying more than one of these decorators to a function.
 """
 
 from py_validate.validator import validate_inputs, validate_outputs
@@ -63,6 +63,7 @@ def operate_invalid_output_check(a):
 
 @validate_inputs(a="number")
 @validate_inputs(b="number")
+@validate_outputs(None, "even")
 def operate_invalid_numbers(a, b):
     return a + b
 
@@ -81,7 +82,7 @@ def operate_integer_in_out(a):
 def test_valid():
     assert sum_numbers(1, 2) == 3
     assert operate_integer_in_out(2) == 3
-    assert operate_invalid_numbers(1, 2) == 3
+    assert operate_invalid_numbers(1, 1) == 2
     assert sum_numbers_input_output(1, 2) == 3
     assert sum_numbers_output_input(1, 2) == 3
     assert sum_numbers_input_override(1.5, 1) == 2.5
@@ -119,6 +120,9 @@ def test_invalid_type():
 
     msg = "Expected an integer but got"
     assert_raises(TypeError, msg, operate_integer_in_out, 1.5)
+
+    msg = "Expected an even integer"
+    assert_raises(ValueError, msg, operate_invalid_numbers, 1, 2)
 
 
 def test_failed_validator():

@@ -59,6 +59,14 @@ def operate_invalid_integer(a):
         return float(a), float(a)
 
 
+@validate_outputs(None, "even")
+def operate_double_except_one(a):
+    if a == 1:
+        return a
+    else:
+        return 2 * int(a)
+
+
 def test_valid():
     # The types are correct.
     assert halve_input(2) == 1
@@ -66,6 +74,7 @@ def test_valid():
     assert operate_invalid_integer(4) == (4, 4)
 
     # These should pass validation.
+    assert operate_double_except_one(2) == 4
     assert triple_quadruple_input(2) == (6, 8)
 
     # Correct count and pass validation
@@ -84,6 +93,9 @@ def test_invalid_type():
 
     msg = "Expected an integer but got"
     assert_raises(TypeError, msg, operate_invalid_integer, 1)
+
+    msg = "Expected an even integer"
+    assert_raises(ValueError, msg, operate_double_except_one, 1)
 
 
 def test_failed_validator():
