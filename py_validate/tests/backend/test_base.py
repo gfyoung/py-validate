@@ -51,8 +51,9 @@ class TestDocSubstitution(object):
 
     @pytest.mark.parametrize("tabs", [0, 1, 2])
     def test_doc_no_substitute(self, tabs):
+        doc_substitution = DocSubstitution(tabs=tabs, name="foo")
 
-        @DocSubstitution(tabs=tabs, name="foo")
+        @doc_substitution
         def f():
             """
             Returns 1.
@@ -90,6 +91,27 @@ class TestDocSubstitution(object):
         # Now the tab count matters because the substitution is multi-line.
         assert f.__doc__ == ("\n            Returns foo\n" +
                              "    " * tabs + "bar.\n            ")
+
+    @pytest.mark.parametrize("tabs", [0, 1, 2])
+    def test_doc_multi_substitute(self, tabs):
+        doc_substitution = DocSubstitution(tabs=tabs, name="foo\nbar",
+                                           explanation="We do this because "
+                                                       "it is necessary.")
+
+        @doc_substitution
+        def f():
+            """
+            Returns {name}.
+
+            {explanation}
+            """
+            return "foo"
+
+        # The tab count matters because one of the substitutions is multi-line.
+        assert f.__doc__ == ("\n            Returns foo\n" +
+                             "    " * tabs + "bar.\n\n" +
+                             "            We do this because it is necessary."
+                             "\n            ")
 
 
 class TestValidatedFunction(object):
