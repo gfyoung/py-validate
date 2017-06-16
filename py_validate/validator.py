@@ -1,7 +1,7 @@
 """
 Provides wrapper functions to validate inputs and outputs for functions.
 
-This wrappers work by instantiating a class object that wraps the function
+These wrappers work by instantiating a class object that wraps the function
 to accept input and output validators that are then used to check inputs and
 outputs before and after the function is called respectively.
 """
@@ -23,7 +23,9 @@ def validate_inputs(**validators):
         A dictionary mapping argument names to validators. Each validator
         can either be a type or callable, which be used to check whether
         the value supplied for that argument is valid.
+
         {validator_doc}
+
     Returns
     -------
     input_validator_decorator : callable
@@ -55,7 +57,9 @@ def validate_outputs(exp_len=None, *validators):
         function call. It is assumed that the first validator provided
         is to check the first returned element, the second validator
         provided is to check the second returned element, etc.
+
         {validator_doc}
+
     Returns
     -------
     output_validator_decorator : callable

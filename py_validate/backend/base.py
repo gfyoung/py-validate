@@ -5,13 +5,12 @@ Base class that underlies the validation wrappers for input and output.
 from .shortcuts import mappings
 
 
-validator_doc = """
-If a string is provided, that means we are using a shortcut,
+validator_doc = """If a string is provided, that means we are using a shortcut,
 which is a callable that returns None and raises an Exception
 if the validation fails.
 
-If an invalid shortcut is provided, a TypeError will also be
-raised. Currently, valid shortcuts are:
+If an invalid shortcut is provided, a TypeError will be raised.
+Currently, valid shortcuts are:
 
 1) number - The input must be a number.
 2) integer - The input must be an integer. This means that type
@@ -24,8 +23,7 @@ If a type is provided, we check if the variable is an instance
 of that type, and we raise a TypeError if there is a type mismatch.
 
 If a callable is provided, we expect the variable to return True
-if the check passes and raise OR return False if the check fails.
-"""
+if the check passes and raise OR return False if the check fails."""
 
 
 class DocSubstitution(object):
@@ -196,7 +194,9 @@ class ValidatedFunction(object):
             The value of the argument.
         validator : str, type, callable, or None
             The method by which to validate the argument.
+
             {validator_doc}
+
         Raises
         ------
         TypeError : the argument had a type mismatch with `validator` OR
