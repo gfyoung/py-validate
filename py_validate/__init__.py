@@ -1,8 +1,5 @@
 from py_validate.validator import *  # noqa
 
-from subprocess import call
-from os.path import dirname
-
 __version__ = "0.0.2"
 
 __doc__ = """
@@ -21,6 +18,9 @@ def test():
     except ImportError:
         raise ImportError("pytest not found. Please install "
                           "with `pip install pytest`")
+
+    from subprocess import call
+    from os.path import dirname
 
     directory = dirname(__file__)
     call(["pytest", directory])
