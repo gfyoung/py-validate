@@ -61,7 +61,7 @@ def operate_invalid_output_check(a):
     return a - 1
 
 
-@validate_inputs(a="number")
+@validate_inputs(a="odd")
 @validate_inputs(b="number")
 @validate_outputs(None, "even")
 def operate_invalid_numbers(a, b):
@@ -115,6 +115,8 @@ def test_invalid_type():
 
     msg = "Expected a number but got"
     assert_raises(TypeError, msg, operate_invalid_numbers, 1, "foo")
+
+    msg = "Expected an integer but got"
     assert_raises(TypeError, msg, operate_invalid_numbers, "foo", 1)
     assert_raises(TypeError, msg, operate_invalid_numbers, "foo", "bar")
 

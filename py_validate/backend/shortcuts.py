@@ -63,7 +63,28 @@ def check_even(x):
         raise ValueError("Expected an even integer")
 
 
+def check_odd(x):
+    """
+    Check if a variable is an odd number.
+
+    Parameters
+    ----------
+    x : object
+        The variable to check.
+
+    Raises
+    ------
+    TypeError : the variable was not an odd number.
+    """
+
+    check_integer(x)
+
+    if x % 2 != 1:
+        raise ValueError("Expected an odd integer")
+
+
 mappings = {
+    "odd": check_odd,
     "even": check_even,
     "number": check_number,
     "integer": check_integer,

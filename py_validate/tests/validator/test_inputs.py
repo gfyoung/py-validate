@@ -55,6 +55,11 @@ def operate_only_odd(a):
     return ((a - 1) / 2) - 5
 
 
+@validate_inputs(a="odd")
+def operate_only_odd_two(a):
+    return a + 1
+
+
 @validate_inputs(a=2)
 def operate_invalid_check(a):
     return a + 1
@@ -74,6 +79,7 @@ def test_valid():
     # The types are correct.
     assert increment(1) == 2
     assert operate_only_odd(7) == -2
+    assert operate_only_odd_two(7) == 8
 
     # These should pass validation.
     assert operate_only_even(2) == -4
@@ -141,6 +147,9 @@ def test_invalid_type():
 
     msg = "Expected an even integer"
     assert_raises(ValueError, msg, operate_only_even_two, 1)
+
+    msg = "Expected an odd integer"
+    assert_raises(ValueError, msg, operate_only_odd_two, 2)
 
 
 def test_failed_validator():

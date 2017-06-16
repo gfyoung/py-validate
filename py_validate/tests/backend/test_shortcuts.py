@@ -86,3 +86,26 @@ class TestCheckEven(object):
     def test_invalid_even_not_even(self, invalid):
         msg = "Expected an even integer"
         assert_raises(ValueError, msg, shortcuts.check_even, invalid)
+
+
+class TestCheckOdd(object):
+
+    @pytest.mark.parametrize("valid", [
+        1, -1, 3, 11, 101, 7, 3
+    ])
+    def test_valid_odd(self, valid):
+        shortcuts.check_odd(valid)
+
+    @pytest.mark.parametrize("invalid", [
+        1.5, -2.0, [1, 2], "foo", (1, 2), True
+    ])
+    def test_invalid_odd_not_int(self, invalid):
+        msg = "Expected an integer but got"
+        assert_raises(TypeError, msg, shortcuts.check_odd, invalid)
+
+    @pytest.mark.parametrize("invalid", [
+        2, 4, 6, -10, 14, 100
+    ])
+    def test_invalid_even_not_even(self, invalid):
+        msg = "Expected an odd integer"
+        assert_raises(ValueError, msg, shortcuts.check_odd, invalid)
