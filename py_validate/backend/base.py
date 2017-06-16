@@ -5,6 +5,73 @@ Base class that underlies the validation wrappers for input and output.
 from .shortcuts import mappings
 
 
+validator_doc = """
+If a string is provided, that means we are using a shortcut,
+which is a callable that returns None and raises an Exception
+if the validation fails.
+
+If an invalid shortcut is provided, a TypeError will also be
+raised. Currently, valid shortcuts are:
+
+1) number - The input must be a number.
+2) integer - The input must be an integer. This means that type
+             of the input must be integral. Thus, "1.0" will fail
+             this check even though it is equal to an integer.
+3) even - The input must be an even integer.
+4) odd - The input must be an odd integer.
+
+If a type is provided, we check if the variable is an instance
+of that type, and we raise a TypeError if there is a type mismatch.
+
+If a callable is provided, we expect the variable to return True
+if the check passes and raise OR return False if the check fails.
+"""
+
+
+class DocSubstitution(object):
+
+    def __init__(self, tabs=0, **kwargs):
+        """
+        Initialize a DocSubstitution instance.
+
+        Parameters
+        ----------
+        tabs : int, default 0
+            The number of "tabs" (or rather, four spaces) we use
+            to indent each line of the substituted value. This will
+            impact how they are displayed in the docstring.
+        kwargs : kwargs
+            The parameters that we are going to pass into the function
+            docstring so that it displays the correct documentation.
+        """
+
+        formatted_kwargs = {}
+
+        for param, value in kwargs.items():
+            new_lines = [line for line in value.split("\n")]
+            new_value = ("\n" + "    " * tabs).join(new_lines)
+
+            formatted_kwargs[param] = new_value
+
+        self.params = formatted_kwargs
+
+    def __call__(self, f):
+        """
+        Wrapper method around calling `f`.
+
+        Before calling the function, the docstring is filled with the
+        parameters specified in the constructor (`self.params`).
+
+        Returns
+        -------
+        new_f : callable
+            The same method `f` with the filled-in documentation.
+        """
+
+        f.__doc__ = f.__doc__ and f.__doc__.format(**self.params)
+        return f
+
+
 class ValidatedFunction(object):
 
     def __init__(self, f):
@@ -116,6 +183,7 @@ class ValidatedFunction(object):
         self._output_validators = self._output_validators + validators
 
     @staticmethod
+    @DocSubstitution(tabs=3, validator_doc=validator_doc)
     def _check_value(arg, val, validator):
         """
         Check whether a value provided for an argument is valid.
@@ -127,26 +195,8 @@ class ValidatedFunction(object):
         val : object
             The value of the argument.
         validator : str, type, callable, or None
-            The method by which to validate the argument. If a string is
-            provided, that means we are using a shortcut, which is a callable
-            that returns None and raises TypeError if the validation fails.
-
-            If an invalid shortcut is provided, a TypeError will also be
-            raised. Currently, valid shortcuts are:
-
-            1) number - The input must be a number.
-            2) integer - The input must be an integer. This means that type
-                         of the input must be integral. Thus, "1.0" will fail
-                         this check even though it is equal to an integer.
-            3) even - The input must be an even integer.
-            4) odd - The input must be an odd integer.
-
-            If a type is provided, we check if the variable is an instance
-            of that type, and we raise a TypeError if there is a type mismatch.
-
-            If a callable is provided, we expect the variable to return True
-            if the check passes and raise OR return False if the check fails.
-
+            The method by which to validate the argument.
+            {validator_doc}
         Raises
         ------
         TypeError : the argument had a type mismatch with `validator` OR

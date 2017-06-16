@@ -7,10 +7,12 @@ outputs before and after the function is called respectively.
 """
 
 from py_validate.backend import ValidatedFunction
+from py_validate.backend.base import DocSubstitution, validator_doc
 
 __all__ = ["validate_inputs", "validate_outputs"]
 
 
+@DocSubstitution(tabs=2, validator_doc=validator_doc)
 def validate_inputs(**validators):
     """
     Wrapper for validating the inputs of a function.
@@ -21,7 +23,7 @@ def validate_inputs(**validators):
         A dictionary mapping argument names to validators. Each validator
         can either be a type or callable, which be used to check whether
         the value supplied for that argument is valid.
-
+        {validator_doc}
     Returns
     -------
     input_validator_decorator : callable
@@ -38,6 +40,7 @@ def validate_inputs(**validators):
     return wrapper
 
 
+@DocSubstitution(tabs=2, validator_doc=validator_doc)
 def validate_outputs(exp_len=None, *validators):
     """
     Wrapper for validating the outputs of a function.
@@ -50,9 +53,9 @@ def validate_outputs(exp_len=None, *validators):
     validators : varargs
         A list of validators to check against arguments returned from a
         function call. It is assumed that the first validator provided
-        is to check the first returned element, the second validator provided
-        is to check the second returned element, etc.
-
+        is to check the first returned element, the second validator
+        provided is to check the second returned element, etc.
+        {validator_doc}
     Returns
     -------
     output_validator_decorator : callable
