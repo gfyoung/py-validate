@@ -23,7 +23,8 @@ If a type is provided, we check if the variable is an instance
 of that type, and we raise a TypeError if there is a type mismatch.
 
 If a callable is provided, we expect the variable to return True
-if the check passes and raise OR return False if the check fails."""
+(or some equivalent like one) if the check passes and raise OR
+return False (or some equivalent like zero) if the check fails."""
 
 
 class DocSubstitution(object):
