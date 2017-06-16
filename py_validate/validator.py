@@ -11,8 +11,13 @@ from py_validate.backend.base import DocSubstitution, validator_doc
 
 __all__ = ["validate_inputs", "validate_outputs"]
 
+validator_type_doc = """Each validator can either be a shortcut string, type,
+or callable, which be used to check whether the value
+supplied for that argument is valid."""
 
-@DocSubstitution(tabs=2, validator_doc=validator_doc)
+
+@DocSubstitution(tabs=2, validator_doc=validator_doc,
+                 validator_type_doc=validator_type_doc)
 def validate_inputs(**validators):
     """
     Wrapper for validating the inputs of a function.
@@ -20,9 +25,9 @@ def validate_inputs(**validators):
     Parameters
     ----------
     validators : kwargs
-        A dictionary mapping argument names to validators. Each validator
-        can either be a type or callable, which be used to check whether
-        the value supplied for that argument is valid.
+        A dictionary mapping argument names to validators.
+
+        {validator_type_doc}
 
         {validator_doc}
 
@@ -42,7 +47,8 @@ def validate_inputs(**validators):
     return wrapper
 
 
-@DocSubstitution(tabs=2, validator_doc=validator_doc)
+@DocSubstitution(tabs=2, validator_doc=validator_doc,
+                 validator_type_doc=validator_type_doc)
 def validate_outputs(exp_len=None, *validators):
     """
     Wrapper for validating the outputs of a function.
@@ -57,6 +63,8 @@ def validate_outputs(exp_len=None, *validators):
         function call. It is assumed that the first validator provided
         is to check the first returned element, the second validator
         provided is to check the second returned element, etc.
+
+        {validator_type_doc}
 
         {validator_doc}
 

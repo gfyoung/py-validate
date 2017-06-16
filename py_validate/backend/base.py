@@ -6,8 +6,8 @@ from .shortcuts import mappings
 
 
 validator_doc = """If a string is provided, that means we are using a shortcut,
-which is a callable that returns None and raises an Exception
-if the validation fails.
+which maps to a callable that returns None and raises an
+Exception if the validation fails.
 
 If an invalid shortcut is provided, a TypeError will be raised.
 Currently, valid shortcuts are:
@@ -22,7 +22,7 @@ Currently, valid shortcuts are:
 If a type is provided, we check if the variable is an instance
 of that type, and we raise a TypeError if there is a type mismatch.
 
-If a callable is provided, we expect the variable to return True
+If a callable is provided, we expect the callable to return True
 (or some equivalent like one) if the check passes and raise OR
 return False (or some equivalent like zero) if the check fails."""
 
