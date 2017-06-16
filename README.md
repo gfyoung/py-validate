@@ -95,16 +95,90 @@ TypeError: Incorrect type for variable 'b': expected float but got int instead
 TypeError: Incorrect type for variable 'Output 0': expected int but got float instead
 ~~~
 
-This library also comes with some shortcuts that can make it easier to write verification checks:
+This library also comes with some shortcuts that can make it easier to write verification checks.
+The following examples illustrate how to use each of the available shortcuts, which are:
+
+* **number**: the value must be a number
+* **integer**: the value must be an integer
+* **even**: the value must be an even integer
+* **odd**: the value must be an odd integer
 
 ~~~python
 import py_validate as pv
 
-@pv.validate_inputs(a="number")
+@pv.validate_inputs(a="number")  # The input must be a number.
 def increment_input(a):
     return a + 1
 
 >>> increment_input("foo")
 ...
 TypeError: Expected a number but got: 'str'
+
+>>> increment_input(1.5)
+2.5
+
+@pv.validate_inputs(a="integer")  # The input must be an integer by type.
+def increment_input_two(a):
+    return a + 1
+
+>>> increment_input_two("foo")
+...
+TypeError: Expected an integer but got: 'str'
+
+>>> increment_input_two(1.5)
+...
+TypeError: Expected an integer but got: 'float'
+
+>>> increment_input_two(1.0)  # The type is float.
+...
+TypeError: Expected an integer but got: 'float'
+
+>>> increment_input_two(2)
+3
+
+@pv.validate_inputs(a="even")  # The input must be an even integer.
+def increment_input_three(a):
+    return a + 1
+
+>>> increment_input_three("foo")
+...
+TypeError: Expected an integer but got: 'str'
+
+>>> increment_input_three(1.5)
+...
+TypeError: Expected an integer but got: 'float'
+
+>>> increment_input_three(1.0)  # The type is float.
+...
+TypeError: Expected an integer but got: 'float'
+
+>>> increment_input_three(1)
+...
+ValueError: Expected an even integer
+
+>>> increment_input_three(2)
+3
+
+@pv.validate_inputs(a="odd")  # The input must be an odd integer.
+def increment_input_four(a):
+    return a + 1
+
+>>> increment_input_four("foo")
+...
+TypeError: Expected an integer but got: 'str'
+
+>>> increment_input_four(1.5)
+...
+TypeError: Expected an integer but got: 'float'
+
+>>> increment_input_four(1.0)  # The type is float.
+...
+TypeError: Expected an integer but got: 'float'
+
+>>> increment_input_four(2)
+...
+ValueError: Expected an odd integer
+
+>>> increment_input_four(1)
+2
 ~~~
