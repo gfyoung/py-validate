@@ -28,6 +28,9 @@ return False (or some equivalent like zero) if the check fails."""
 
 
 class DocSubstitution(object):
+    """
+    Decorator class for substituting variables in docstring templates.
+    """
 
     def __init__(self, tabs=0, **kwargs):
         """
@@ -72,10 +75,13 @@ class DocSubstitution(object):
 
 
 class ValidatedFunction(object):
+    """
+    Wrapper class around functions for supporting input and output validation.
+    """
 
     def __init__(self, f):
         """
-        Initialize a _ValidatedFunction instance.
+        Initialize a ValidatedFunction instance.
 
         Parameters
         ----------
