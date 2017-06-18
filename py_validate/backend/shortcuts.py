@@ -1,3 +1,5 @@
+from .helpers import FrozenDict
+
 import numbers
 
 
@@ -85,8 +87,8 @@ def check_odd(x):
 
 # For internal use only. The only thing that should
 # access this is "get_shortcut."
-mappings = dict(odd=check_odd, even=check_even,
-                number=check_number, integer=check_integer)
+mappings = FrozenDict(odd=check_odd, even=check_even,
+                      number=check_number, integer=check_integer)
 
 
 def get_shortcut(shortcut):
