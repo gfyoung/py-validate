@@ -113,7 +113,7 @@ class TestNamespace(object):
     def test_pv_backend_namespace(self):
         import py_validate.backend as backend
         expected = {"ValidatedFunction", "base",
-                    "mappings", "shortcuts"}
+                    "get_shortcut", "shortcuts"}
 
         self._check_namespace(backend, expected)
 

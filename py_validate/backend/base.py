@@ -2,7 +2,7 @@
 Base class that underlies the validation wrappers for input and output.
 """
 
-from .shortcuts import mappings
+from .shortcuts import get_shortcut
 
 
 validator_doc = """If a string is provided, that means we are using a shortcut,
@@ -338,13 +338,8 @@ class ValidatedFunction(object):
             return
 
         if isinstance(validator, str):
-            msg = "Unknown shortcut: '{shortcut}'".format(shortcut=validator)
-            validator = mappings.get(validator)
-
-            if validator is not None:
-                validator(val)
-            else:
-                raise ValueError(msg)
+            validator = get_shortcut(validator)
+            validator(val)
 
         elif isinstance(validator, type):
             if not isinstance(val, validator):

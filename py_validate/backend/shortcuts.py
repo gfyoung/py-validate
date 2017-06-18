@@ -83,9 +83,35 @@ def check_odd(x):
         raise ValueError("Expected an odd integer")
 
 
-mappings = {
-    "odd": check_odd,
-    "even": check_even,
-    "number": check_number,
-    "integer": check_integer,
-}
+# For internal use only. The only thing that should
+# access this is "get_shortcut."
+mappings = dict(odd=check_odd, even=check_even,
+                number=check_number, integer=check_integer)
+
+
+def get_shortcut(shortcut):
+    """
+    Get the function associated with a particular shortcut.
+
+    Parameters
+    ----------
+    shortcut : str
+        The shortcut name associated with a function.
+
+    Returns
+    -------
+    shortcut_func : callable
+        The associated function with a shortcut.
+
+    Raises
+    ------
+    ValueError : an invalid shortcut name was provided.
+    """
+
+    shortcut_func = mappings.get(shortcut)
+
+    if shortcut_func is None:
+        msg = "Unknown shortcut: '{shortcut}'"
+        raise ValueError(msg.format(shortcut=shortcut))
+
+    return shortcut_func
