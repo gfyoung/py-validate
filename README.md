@@ -204,10 +204,29 @@ have been set, they cannot be changed. Doing so will cause an error to be raised
 ~~~python
 import py_validate as pv
 
-@validate_inputs(a=int)
-@validate_inputs(a=float)
+@pv.validate_inputs(a=int)
+@pv.validate_inputs(a=float)
 def increment_input_five(a):
     return a + 1
 ...
 ValueError : Validator(s) for input 'a' already set.
+~~~
+
+Finally, if your function happens to return multiple output variables, the default is to
+evaluate each element of the returned tuple. If you want the actual tuple object to be
+validated, pass in `-1` for the expected output length:
+
+~~~python
+import py_validate as pv
+
+@pv.validate_outputs(-1, tuple)
+def return_tuple_if_one(a):
+    if a == 1:
+        return tuple()
+    else:
+        return "foo"
+
+>>> return_tuple_if_one(0)
+...
+TypeError: Incorrect type for variable 'Output 0': expected tuple but got str instead
 ~~~
