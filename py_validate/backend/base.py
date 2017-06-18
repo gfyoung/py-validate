@@ -200,9 +200,28 @@ class ValidatedFunction(object):
         if validator is None:
             return
 
+        def raise_exception_failure(inp_name, e):
+            """
+            Raise an informative failure if the validator raises an Exception.
+
+            Parameters
+            ----------
+            inp_name : str
+                The name of the input on which the validation failed.
+            e : Exception
+                The error that was raised during execution of the validator.
+            """
+
+            exception_failure = "Failed validation for input '{inp_name}': "
+            raise type(e)(exception_failure.format(inp_name=inp_name) + str(e))
+
         if isinstance(validator, str):
             validator = get_shortcut(validator)
-            validator(val)
+
+            try:
+                validator(val)
+            except Exception as e:
+                raise_exception_failure(arg, e)
 
         elif isinstance(validator, type):
             if not isinstance(val, validator):
@@ -218,8 +237,7 @@ class ValidatedFunction(object):
             try:
                 is_valid = validator(val)
             except Exception as e:
-                msg = "Failed validation for input '{inp_name}': " + str(e)
-                raise type(e)(msg.format(inp_name=arg))
+                raise_exception_failure(arg, e)
 
             if is_valid is False:
                 msg = ("Invalid value for variable "
