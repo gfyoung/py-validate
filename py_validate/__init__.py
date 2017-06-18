@@ -1,6 +1,6 @@
 from py_validate.validator import *  # noqa
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 __doc__ = """
 py_validate - Easy-to-use, customizable function validator wrappers in
