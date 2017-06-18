@@ -7,8 +7,8 @@ outputs before and after the function is called respectively.
 """
 
 from py_validate.backend import ValidatedFunction
-from py_validate.backend.base import (DocSubstitution, validator_doc,
-                                      output_len_doc)
+from py_validate.backend.helpers import DocSubstitution
+from py_validate.backend.base import validator_doc, output_len_doc
 
 __all__ = ["validate_inputs", "validate_outputs"]
 
