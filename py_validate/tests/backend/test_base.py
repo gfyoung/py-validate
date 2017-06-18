@@ -9,6 +9,44 @@ from py_validate.tests import assert_raises
 import pytest
 
 
+class TestNamespace(object):
+
+    @staticmethod
+    def _check_namespace(namespace, expected):
+        """
+        Check that the module namespace matches what we expect it to contain.
+
+        Parameters
+        ----------
+        namespace : module
+            The module that we are to check.
+        expected : set
+            Set of method and object names that we expect it to contain, no
+            more, no less (excluding attributes starting with "__")
+
+        Raises
+        ------
+        AssertionError : the check failed.
+        """
+
+        namespace = set([f for f in dir(namespace) if not f.startswith("__")])
+        assert len(namespace ^ expected) == 0
+
+    def test_pv_namespace(self):
+        import py_validate as pv
+        expected = {"backend", "test", "validate_inputs",
+                    "tests", "validate_outputs", "validator"}
+
+        self._check_namespace(pv, expected)
+
+    def test_pv_backend_namespace(self):
+        import py_validate.backend as backend
+        expected = {"ValidatedFunction", "base",
+                    "get_shortcut", "shortcuts"}
+
+        self._check_namespace(backend, expected)
+
+
 class TestFrozenDict(object):
 
     def test_init(self):
@@ -78,44 +116,6 @@ class TestFrozenDict(object):
         assert_raises(KeyError, None, d.update, foo=3)
         assert_raises(KeyError, None, d.update, {3: 5})
         assert_raises(KeyError, None, d.update, [(1, 3)])
-
-
-class TestNamespace(object):
-
-    @staticmethod
-    def _check_namespace(namespace, expected):
-        """
-        Check that the module namespace matches what we expect it to contain.
-
-        Parameters
-        ----------
-        namespace : module
-            The module that we are to check.
-        expected : set
-            Set of method and object names that we expect it to contain, no
-            more, no less (excluding attributes starting with "__")
-
-        Raises
-        ------
-        AssertionError : the check failed.
-        """
-
-        namespace = set([f for f in dir(namespace) if not f.startswith("__")])
-        assert len(namespace ^ expected) == 0
-
-    def test_pv_namespace(self):
-        import py_validate as pv
-        expected = {"backend", "test", "validate_inputs",
-                    "tests", "validate_outputs", "validator"}
-
-        self._check_namespace(pv, expected)
-
-    def test_pv_backend_namespace(self):
-        import py_validate.backend as backend
-        expected = {"ValidatedFunction", "base",
-                    "get_shortcut", "shortcuts"}
-
-        self._check_namespace(backend, expected)
 
 
 class TestDocSubstitution(object):
