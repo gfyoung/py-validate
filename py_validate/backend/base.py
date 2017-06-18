@@ -30,6 +30,10 @@ return False (or some equivalent like zero) if the check fails."""
 class DocSubstitution(object):
     """
     Decorator class for substituting variables in docstring templates.
+
+    This is an internal class, so we will not be verifying parameters
+    in any way in this function. We trust the developer will not pass
+    in incorrect inputs to this class.
     """
 
     def __init__(self, tabs=0, **kwargs):
@@ -42,16 +46,28 @@ class DocSubstitution(object):
             The number of "tabs" (or rather, four spaces) we use
             to indent each line of the substituted value. This will
             impact how they are displayed in the docstring.
+
+            This is also the default tabbing in case we pass in special
+            tabbing requirements for a specific docstring substitution.
         kwargs : kwargs
             The parameters that we are going to pass into the function
             docstring so that it displays the correct documentation.
+
+            The value of each key can either be the docstring that
+            we are expecting or a tuple of length two comprised of
+            the docstring and the tabbing for that docstring.
         """
 
         formatted_kwargs = {}
 
         for param, value in kwargs.items():
+            if isinstance(value, tuple):
+                value, tabs_count = value
+            else:  # just the parameter value
+                tabs_count = tabs
+
             new_lines = [line for line in value.split("\n")]
-            new_value = ("\n" + "    " * tabs).join(new_lines)
+            new_value = ("\n" + "    " * tabs_count).join(new_lines)
 
             formatted_kwargs[param] = new_value
 

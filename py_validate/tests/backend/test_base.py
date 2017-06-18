@@ -93,6 +93,25 @@ class TestDocSubstitution(object):
                              "    " * tabs + "bar.\n            ")
 
     @pytest.mark.parametrize("tabs", [0, 1, 2])
+    def test_doc_substitute_multi_override(self, tabs):
+        override_tab_count = 3
+        doc_substitution = DocSubstitution(tabs=tabs,
+                                           name=("foo\nbar",
+                                                 override_tab_count))
+
+        @doc_substitution
+        def f():
+            """
+            Returns {name}.
+            """
+            return "foo\nbar"
+
+        # Now the tab count matters because the substitution is multi-line.
+        assert f.__doc__ == ("\n            Returns foo\n" +
+                             "    " * override_tab_count + "bar.\n" +
+                             "            ")
+
+    @pytest.mark.parametrize("tabs", [0, 1, 2])
     def test_doc_multi_substitute(self, tabs):
         doc_substitution = DocSubstitution(tabs=tabs, name="foo\nbar",
                                            explanation="We do this because "
@@ -112,6 +131,30 @@ class TestDocSubstitution(object):
                              "    " * tabs + "bar.\n\n" +
                              "            We do this because it is necessary."
                              "\n            ")
+
+    @pytest.mark.parametrize("tabs", [0, 1, 2])
+    def test_doc_multi_substitute_override(self, tabs):
+        override_tab_count = 3
+        doc_substitution = DocSubstitution(tabs=tabs, name="foo\nbar",
+                                           explanation=("We do this because\n"
+                                                        "it is necessary.",
+                                                        override_tab_count))
+
+        @doc_substitution
+        def f():
+            """
+            Returns {name}.
+
+            {explanation}
+            """
+            return "foo"
+
+        # The tab count matters because one of the substitutions is multi-line.
+        assert f.__doc__ == ("\n            Returns foo\n" +
+                             "    " * tabs + "bar.\n\n" +
+                             "            We do this because\n" +
+                             "    " * override_tab_count + "it is necessary.\n"
+                             "            ")
 
 
 class TestValidatedFunction(object):
