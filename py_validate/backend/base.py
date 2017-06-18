@@ -215,7 +215,11 @@ class ValidatedFunction(object):
                                            exp_type=exp_type,
                                            act_type=act_type))
         elif callable(validator):
-            is_valid = validator(val)
+            try:
+                is_valid = validator(val)
+            except Exception as e:
+                msg = "Failed validation for input '{inp_name}': " + str(e)
+                raise type(e)(msg.format(inp_name=arg))
 
             if is_valid is False:
                 msg = ("Invalid value for variable "

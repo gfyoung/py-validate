@@ -62,7 +62,7 @@ def test_invalid():
     assert_raises(TypeError, msg, wrapper, 1)
 
 
-def test_callable():
+def test_callable_bool():
     @validate_inputs(a=lambda x: x == 1)
     def wrapper(a):
         return f(a)
@@ -72,6 +72,25 @@ def test_callable():
     msg = "Invalid value for variable"
     assert_raises(ValueError, msg, wrapper, 1.5)
     assert_raises(ValueError, msg, wrapper, "foo")
+
+
+def test_callable_exception():
+    msg = "input must be 1"
+
+    def validate(a):
+        if a != 1:
+            raise ValueError(msg)
+
+    @validate_inputs(a=validate)
+    def wrapper(a):
+        return f(a)
+
+    assert wrapper(1) == 0
+
+    msg = "Failed validation for input 'a': " + msg
+
+    assert_raises(ValueError, msg, wrapper, "foo")
+    assert_raises(ValueError, msg, wrapper, 1.5)
 
 
 def test_varargs():
