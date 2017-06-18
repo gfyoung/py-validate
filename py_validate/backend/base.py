@@ -23,8 +23,7 @@ If a type is provided, we check if the variable is an instance
 of that type, and we raise a TypeError if there is a type mismatch.
 
 If a callable is provided, we expect the callable to return True
-(or some equivalent like one) if the check passes and raise OR
-return False (or some equivalent like zero) if the check fails."""
+if the check passes and raise OR return False if the check fails."""
 
 output_len_doc = """exp_output_len : int > 0, -1, or None
     The expected number of elements in the result.
