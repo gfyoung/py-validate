@@ -145,4 +145,9 @@ class TestValidatedFunction(object):
     def test_input_bad_exp_len(self):
         validator = ValidatedFunction(lambda x: x + 1)
         msg = "Expected an integer for expected output length"
+        assert_raises(TypeError, msg, validator.update_exp_output_len, 1.0)
         assert_raises(TypeError, msg, validator.update_exp_output_len, "foo")
+
+        validator = ValidatedFunction(lambda x: x + 1)
+        msg = "Expected output length must be positive"
+        assert_raises(ValueError, msg, validator.update_exp_output_len, -1)

@@ -156,8 +156,14 @@ class ValidatedFunction(object):
             The new expected length of the function output.
         """
 
-        if not (exp_output_len is None or isinstance(exp_output_len, int)):
-            raise TypeError("Expected an integer for expected output length")
+        if exp_output_len is not None:
+            if not isinstance(exp_output_len, int):
+                raise TypeError("Expected an integer for "
+                                "expected output length")
+
+            if exp_output_len < 0:
+                raise ValueError("Expected output length "
+                                 "must be positive")
 
         self._exp_output_len = exp_output_len
 
