@@ -3,6 +3,21 @@
 # py-validate
 Function wrappers for verifying Python arguments and return values.
 
+# Installation
+You can just install via `pip`:
+~~~
+pip install py_validate
+~~~
+
+Alternatively, you can download the source code and in the top directory of the code, run either:
+~~~
+pip install .
+~~~
+or
+~~~
+python setup.py install
+~~~
+
 # Examples
 Function wrappers nicely abstract away checks on inputs and outputs that can sometimes clutter implementation of the function itself, as illustrated below in this example:
 
