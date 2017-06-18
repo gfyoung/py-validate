@@ -21,20 +21,6 @@ def test_two_inputs():
     assert_raises(TypeError, msg, wrapper, "foo", "foo")
 
 
-# TODO: this behavior should be disallowed
-def test_input_override():
-    @validate_inputs(a=float)
-    @validate_inputs(a=int)
-    def wrapper(a):
-        return a
-
-    assert wrapper(1.0) == 1
-
-    msg = "Incorrect type for variable"
-    assert_raises(TypeError, msg, wrapper, 1)
-    assert_raises(TypeError, msg, wrapper, "foo")
-
-
 def test_output_override():
     @validate_outputs(1)
     @validate_outputs(None, int)

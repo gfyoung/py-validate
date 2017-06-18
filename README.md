@@ -197,3 +197,17 @@ ValueError: Expected an odd integer
 >>> increment_input_four(1)
 2
 ~~~
+
+When specifying validators for input variables, do note that once validators for a variable
+have been set, they cannot be changed. Doing so will cause an error to be raised:
+
+~~~python
+import py_validate as pv
+
+@validate_inputs(a=int)
+@validate_inputs(a=float)
+def increment_input_five(a):
+    return a + 1
+...
+ValueError : Validator(s) for input 'a' already set.
+~~~

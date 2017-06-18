@@ -39,6 +39,81 @@ output_len_doc = """exp_output_len : int > 0, -1, or None
     the latter, we verify the elements of the tuple."""
 
 
+class FrozenDict(dict):
+    """
+    Dictionary in which keys, once set, cannot be updated unless the
+    key is deleted and set once again.
+
+    This is an internal class, so we will not be verifying parameters
+    in any way in this function. We trust the developer will not pass
+    in incorrect inputs to this class.
+    """
+
+    def __setitem__(self, key, value):
+        """
+        Override `dict.__setitem__` by checking whether the key exists
+        in the dictionary before setting the key.
+
+        Parameters
+        ----------
+        key : object
+            The key to hash and set in the dictionary.
+        value : object
+            The associated value to the key in the dictionary.
+
+        Raises
+        ------
+        KeyError : the key already exists in the dictionary.
+        """
+
+        if key in self:
+            raise KeyError(key)
+
+        dict.__setitem__(self, key, value)
+
+    def update(self, new_mappings=None, **keyword_mappings):
+        """
+        Override `dict.update` by explicitly calling our own
+        `self.__setitem__` method to disallow resetting a key.
+
+        Parameters
+        ----------
+        new_mappings : object, default None
+            An object used to update the dictionary, but the method
+            by which we do it depends on two cases:
+
+            1) `new_mappings` has a `.keys()` method
+
+                for k in new_mappings:
+                    self[k] = new_mappings[k]
+
+            2) `new_mappings` has no `.keys()` method
+
+                for k, v in new_mappings:
+                    self[k] = v
+
+        keyword_mappings : kwargs
+            Additional object used to update the dictionary with
+            keyword arguments.
+
+        Raises
+        ------
+        KeyError : one of keys already exists in the dictionary.
+        """
+
+        if new_mappings is not None:
+            keys_method = getattr(new_mappings, "keys", None)
+            if callable(keys_method):
+                for k in new_mappings:
+                    self.__setitem__(k, new_mappings[k])
+            else:
+                for k, v in new_mappings:
+                    self.__setitem__(k, v)
+
+        for k, v in keyword_mappings.items():
+            self.__setitem__(k, v)
+
+
 class DocSubstitution(object):
     """
     Decorator class for substituting variables in docstring templates.
@@ -122,8 +197,8 @@ class ValidatedFunction(object):
         self.var_names = f.__code__.co_varnames
 
         self._exp_output_len = None
-        self._input_validators = {}
         self._output_validators = tuple()
+        self._input_validators = FrozenDict()
 
     @staticmethod
     def _validate_callable(f):
@@ -202,13 +277,25 @@ class ValidatedFunction(object):
         """
         Update the input validators.
 
+        Note that once validators for a variable are set, they cannot
+        be changed. Attempts to do so will cause an error.
+
         Parameters
         ----------
         validators : kwargs
             The new input validators to add / update in the existing ones.
+
+        Raises
+        ------
+        ValueError : validators were attempted to be set for a variable that
+                     already has validators set for it.
         """
 
-        self._input_validators.update(**validators)
+        try:
+            self._input_validators.update(**validators)
+        except KeyError as e:
+            raise ValueError("Validator(s) for input "
+                             "{var} already set.".format(var=str(e)))
 
     def update_output_validators(self, *validators):
         """
