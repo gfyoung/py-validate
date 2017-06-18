@@ -23,7 +23,7 @@ def test_output_no_count():
     assert wrapper(1) == (1, 1)
 
 
-def test_output_count():
+def test_output_positive_count():
     @validate_outputs(2)
     def wrapper(a):
         if a == 1:
@@ -35,6 +35,38 @@ def test_output_count():
 
     msg = "items returned but got"
     assert_raises(ValueError, msg, wrapper, 2)
+
+
+def test_output_negative_count_no_validators():
+    @validate_outputs(-1)
+    def wrapper(a):
+        if a == 1:
+            return f(a), f(a)
+        else:
+            return f(a)
+
+    # Tuples are validated as is, and since
+    # no validators are provided, all outputs
+    # are accepted in this case.
+    assert wrapper(0) == 0
+    assert wrapper(1) == (1, 1)
+
+
+def test_output_negative_count_validators():
+    @validate_outputs(-1, tuple)
+    def wrapper(a):
+        if a == 1:
+            return f(a), f(a)
+        else:
+            return f(a)
+
+    # Tuples are validated as is, and in this
+    # case, we specifically check that we get
+    # a tuple from the function.
+    assert wrapper(1) == (1, 1)
+
+    msg = "Incorrect type for variable"
+    assert_raises(TypeError, msg, wrapper, 0)
 
 
 def test_basic():

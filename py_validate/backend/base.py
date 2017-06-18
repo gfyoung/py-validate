@@ -26,6 +26,18 @@ If a callable is provided, we expect the callable to return True
 (or some equivalent like one) if the check passes and raise OR
 return False (or some equivalent like zero) if the check fails."""
 
+output_len_doc = """exp_output_len : int > 0, -1, or None
+    The expected number of elements in the result.
+
+    If -1 is provided, we will interpret returned tuples
+    as the sole result of the function instead of iterating
+    and verifying each of element of the tuple.
+
+    We do this in order to disambiguate when a tuple object
+    is returned, and when multiple variables are returned.
+    In the former, we verify the tuple object, whereas in
+    the latter, we verify the elements of the tuple."""
+
 
 class DocSubstitution(object):
     """
@@ -155,21 +167,24 @@ class ValidatedFunction(object):
         self._validate_inputs(*args, **kwargs)
         result = self.f(*args, **kwargs)
 
-        if not hasattr(result, "__iter__"):
-            self._validate_outputs(result)
-        else:
+        is_tuple = type(result).__name__ == "tuple"
+        iter_result = is_tuple and self._exp_output_len != -1
+
+        if iter_result:
             self._validate_outputs(*result)
+        else:
+            self._validate_outputs(result)
 
         return result
 
+    @DocSubstitution(tabs=2, output_len_doc=output_len_doc)
     def update_exp_output_len(self, exp_output_len):
         """
         Update the expected length of the function output.
 
         Parameters
         ----------
-        exp_output_len : int
-            The new expected length of the function output.
+        {output_len_doc}
         """
 
         if exp_output_len is not None:
@@ -177,9 +192,9 @@ class ValidatedFunction(object):
                 raise TypeError("Expected an integer for "
                                 "expected output length")
 
-            if exp_output_len < 0:
+            if exp_output_len < 0 and exp_output_len != -1:
                 raise ValueError("Expected output length "
-                                 "must be positive")
+                                 "must be positive or -1")
 
         self._exp_output_len = exp_output_len
 
@@ -302,7 +317,7 @@ class ValidatedFunction(object):
         Validate the outputs of a function.
         """
 
-        if self._exp_output_len is not None:
+        if self._exp_output_len is not None and self._exp_output_len != -1:
             if self._exp_output_len != len(args):
                 raise ValueError(
                     "Expected {exp_count} items returned but "

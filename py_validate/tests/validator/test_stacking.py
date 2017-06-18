@@ -114,6 +114,28 @@ def test_output_input():
     assert_raises(ValueError, msg, wrapper, 1)
 
 
+def test_output_negative_count_stack():
+    @validate_inputs(a=int)
+    @validate_outputs(-1, float)
+    def wrapper(a):
+        if a == 0:
+            return a
+        elif a == 1:
+            return a, a
+        else:
+            return float(a)
+
+    assert wrapper(2) == 2
+    assert wrapper(3) == 3
+
+    msg = "Incorrect type for variable"
+    assert_raises(TypeError, msg, wrapper, 0)
+
+    # We now evaluate the tuple object as is,
+    # not the elements of the tuple itself.
+    assert_raises(TypeError, msg, wrapper, 1)
+
+
 def test_invalid_input_stack():
     @validate_inputs(a=1)
     @validate_outputs(1, int)

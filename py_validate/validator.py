@@ -7,7 +7,8 @@ outputs before and after the function is called respectively.
 """
 
 from py_validate.backend import ValidatedFunction
-from py_validate.backend.base import DocSubstitution, validator_doc
+from py_validate.backend.base import (DocSubstitution, validator_doc,
+                                      output_len_doc)
 
 __all__ = ["validate_inputs", "validate_outputs"]
 
@@ -47,16 +48,17 @@ def validate_inputs(**validators):
     return wrapper
 
 
-@DocSubstitution(tabs=2, validator_doc=validator_doc,
-                 validator_type_doc=validator_type_doc)
-def validate_outputs(exp_len=None, *validators):
+# The output_len_doc parameter documents the `exp_output_len` parameter.
+@DocSubstitution(tabs=2, validator_type_doc=validator_type_doc,
+                 output_len_doc=(output_len_doc, 1),
+                 validator_doc=validator_doc)
+def validate_outputs(exp_output_len=None, *validators):
     """
     Wrapper for validating the outputs of a function.
 
     Parameters
     ----------
-    exp_len : int
-        The expected number of elements in the result.
+    {output_len_doc}
 
     validators : varargs
         A list of validators to check against arguments returned from a
@@ -78,7 +80,7 @@ def validate_outputs(exp_len=None, *validators):
         if not isinstance(f, ValidatedFunction):
             f = ValidatedFunction(f)
 
-        f.update_exp_output_len(exp_len)
+        f.update_exp_output_len(exp_output_len)
         f.update_output_validators(*validators)
 
         return f

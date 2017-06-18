@@ -192,5 +192,5 @@ class TestValidatedFunction(object):
         assert_raises(TypeError, msg, validator.update_exp_output_len, "foo")
 
         validator = ValidatedFunction(lambda x: x + 1)
-        msg = "Expected output length must be positive"
-        assert_raises(ValueError, msg, validator.update_exp_output_len, -1)
+        msg = "Expected output length must be positive or -1"
+        assert_raises(ValueError, msg, validator.update_exp_output_len, -2)
