@@ -117,3 +117,29 @@ def get_shortcut(shortcut):
         raise ValueError(msg.format(shortcut=shortcut))
 
     return shortcut_func
+
+
+class NegateFailure(Exception):
+    """
+    Exception class for when a validation function passes when it shouldn't.
+    """
+
+    pass
+
+
+class NegateShortcut(object):
+
+    def __init__(self, shortcut):
+        self.shortcut = shortcut
+        self.func = get_shortcut(shortcut)
+        self.msg = ("Validation for '{shortcut}' "
+                    "passed when it shouldn't have")
+
+    def __call__(self, x):
+        try:
+            self.func(x)
+            raise NegateFailure(self.msg.format(shortcut=self.shortcut))
+        except NegateFailure:
+            raise
+        except (TypeError, ValueError):
+            pass

@@ -2,6 +2,7 @@
 Unittests for the input validator decorator.
 """
 
+from py_validate.backend.shortcuts import NegateFailure
 from py_validate.validator import validate_inputs
 from py_validate.tests import assert_raises
 
@@ -186,3 +187,14 @@ class TestShortcuts(object):
         msg = "Expected an odd integer"
         assert_raises(ValueError, msg, wrapper, 2)
         assert_raises(ValueError, msg, wrapper, 4)
+
+    def test_negate(self):
+        @validate_inputs(a="~number")
+        def wrapper(a):
+            return a
+
+        assert wrapper("foo") == "foo"
+        assert wrapper((1, 2, 3)) == (1, 2, 3)
+
+        msg = "'number' passed when it shouldn't have"
+        assert_raises(NegateFailure, msg, wrapper, 1)

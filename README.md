@@ -198,6 +198,24 @@ ValueError: Expected an odd integer
 2
 ~~~
 
+The shortcuts can also be negated if specifying the "not" condition is too complicated:
+
+~~~python
+import py_validate as pv
+
+@pv.validate_inputs(a="~number")  # The input must not be a number.
+def identity(a):
+    return a
+
+>>> identity(1)
+...
+py_validate.backend.shortcuts.NegateFailure: Failed validation for input 'a':
+Validation for 'number' passed when it shouldn't have
+
+>>> identity("foo")
+'foo'
+~~~
+
 When specifying validators for input variables, do note that once validators for a variable
 have been set, they cannot be changed. Doing so will cause an error to be raised:
 

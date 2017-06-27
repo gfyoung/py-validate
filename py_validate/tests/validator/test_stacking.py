@@ -4,6 +4,7 @@ we start applying more than one of these decorators to a function.
 """
 
 from py_validate.validator import validate_inputs, validate_outputs
+from py_validate.backend.shortcuts import NegateFailure
 from py_validate.tests import assert_raises
 
 
@@ -188,3 +189,21 @@ def test_shortcuts_stack():
 
     msg = "Expected an even integer"
     assert_raises(ValueError, msg, wrapper, 1)
+
+
+def test_negate_stack():
+    @validate_inputs(a="integer")
+    @validate_inputs(b="~number")
+    def wrapper(a, b):
+        return a * b
+
+    assert wrapper(2, "bar") == "barbar"
+    assert wrapper(3, [1, 2]) == [1, 2, 1, 2, 1, 2]
+
+    msg = "Expected an integer"
+    assert_raises(TypeError, msg, wrapper, "foo", "bar")
+    assert_raises(TypeError, msg, wrapper, [1, 2, 3], "bar")
+
+    msg = "'number' passed when it shouldn't have"
+    assert_raises(NegateFailure, msg, wrapper, 5, 5)
+    assert_raises(NegateFailure, msg, wrapper, 5, 12.1)

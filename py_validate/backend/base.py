@@ -3,7 +3,7 @@ Base class that underlies the validation wrappers for input and output.
 """
 
 from .helpers import DocSubstitution, FrozenDict
-from .shortcuts import get_shortcut
+from .shortcuts import NegateShortcut, get_shortcut
 
 
 validator_doc = """If a string is provided, that means we are using a shortcut,
@@ -216,7 +216,10 @@ class ValidatedFunction(object):
             raise type(e)(exception_failure.format(inp_name=inp_name) + str(e))
 
         if isinstance(validator, str):
-            validator = get_shortcut(validator)
+            if validator.startswith("~"):
+                validator = NegateShortcut(validator[1:])
+            else:
+                validator = get_shortcut(validator)
 
             try:
                 validator(val)

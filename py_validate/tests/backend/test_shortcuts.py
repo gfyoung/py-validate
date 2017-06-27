@@ -1,6 +1,7 @@
-import py_validate.backend.shortcuts as shortcuts
+from py_validate.backend.shortcuts import NegateShortcut
 from py_validate.tests import assert_raises
 
+import py_validate.backend.shortcuts as shortcuts
 import pytest
 
 
@@ -109,3 +110,37 @@ class TestCheckOdd(object):
     def test_invalid_even_not_even(self, invalid):
         msg = "Expected an odd integer"
         assert_raises(ValueError, msg, shortcuts.check_odd, invalid)
+
+
+class TestCheckNegateShortcut(object):
+
+    @pytest.mark.parametrize("invalid", [
+        "foo", "bar", "baz"
+    ])
+    def test_invalid_shortcut_negate(self, invalid):
+        msg = "Unknown shortcut"
+        assert_raises(ValueError, msg, NegateShortcut, invalid)
+
+    @pytest.mark.parametrize("valid,value", [
+        ("number", "foo"),
+        ("integer", 1.0),
+        ("even", 3),
+        ("odd", 2)
+    ])
+    def test_valid_negate(self, valid, value):
+
+        # No Exception should be raised.
+        negate_check = NegateShortcut(valid)
+        negate_check(value)
+
+    @pytest.mark.parametrize("valid,value", [
+        ("number", 1.5),
+        ("integer", 1),
+        ("even", 2),
+        ("odd", 3)
+    ])
+    def test_invalid_negate(self, valid, value):
+        msg = "passed when it shouldn't have"
+        negate_check = NegateShortcut(valid)
+
+        assert_raises(shortcuts.NegateFailure, msg, negate_check, value)
