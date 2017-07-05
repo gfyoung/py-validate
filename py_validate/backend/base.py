@@ -200,7 +200,7 @@ class ValidatedFunction(object):
         if validator is None:
             return
 
-        def raise_exception_failure(inp_name, e):
+        def raise_exception_failure(inp_name, exc):
             """
             Raise an informative failure if the validator raises an Exception.
 
@@ -208,12 +208,13 @@ class ValidatedFunction(object):
             ----------
             inp_name : str
                 The name of the input on which the validation failed.
-            e : Exception
+            exc : Exception
                 The error that was raised during execution of the validator.
             """
 
             exception_failure = "Failed validation for input '{inp_name}': "
-            raise type(e)(exception_failure.format(inp_name=inp_name) + str(e))
+            raise type(exc)(exception_failure.format(
+                inp_name=inp_name) + str(exc))
 
         if isinstance(validator, str):
             if validator.startswith("~"):
