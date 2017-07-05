@@ -2,7 +2,7 @@
 
 if [ -d "$HOME/miniconda3" ] && [ -e "$HOME/miniconda3/bin/conda" ]; then
     echo "Miniconda install already present from cache: $HOME/miniconda3"
-    rm -rf $HOME/miniconda3/envs/stemming  # Just in case...
+    rm -rf $HOME/miniconda3/envs/validate  # Just in case...
 else
     echo "Installing Miniconda..."
 
