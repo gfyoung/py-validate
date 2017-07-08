@@ -1,7 +1,13 @@
+"""
+Top-level directory for all of py_validate's tests.
+
+This is also the place where any test helpers can be stored.
+"""
+
 import pytest
 
 
-def assert_raises(_exception, msg, f, *args, **kwargs):
+def assert_raises(exc, msg, f, *args, **kwargs):
     """
     Wrapper around pytest's raises function.
 
@@ -12,7 +18,7 @@ def assert_raises(_exception, msg, f, *args, **kwargs):
 
     Parameters
     ----------
-    _exception: Exception
+    exc: type
         The Exception class to check for.
 
     msg: str or None
@@ -22,7 +28,7 @@ def assert_raises(_exception, msg, f, *args, **kwargs):
         The function that we are calling.
     """
 
-    with pytest.raises(_exception) as exc_info:
+    with pytest.raises(exc) as exc_info:
         f(*args, **kwargs)
 
     if msg is not None:
