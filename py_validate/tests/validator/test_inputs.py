@@ -24,6 +24,13 @@ def test_basic():
     msg = "Incorrect type for variable"
     assert_raises(TypeError, msg, wrapper, 1.5)
     assert_raises(TypeError, msg, wrapper, "foo")
+    assert_raises(TypeError, msg, wrapper, [1, 2])
+
+
+def test_bad_arg_count():
+    @validate_inputs(a=int)
+    def wrapper(a):
+        return f(a)
 
     # We expect Python to handle incorrect
     # argument counts for us before validation.
@@ -73,6 +80,7 @@ def test_callable_bool():
     msg = "Invalid value for variable"
     assert_raises(ValueError, msg, wrapper, 1.5)
     assert_raises(ValueError, msg, wrapper, "foo")
+    assert_raises(ValueError, msg, wrapper, dict())
 
 
 def test_callable_exception():
@@ -89,7 +97,6 @@ def test_callable_exception():
     assert wrapper(1) == 0
 
     msg = "Failed validation for input 'a': " + msg
-
     assert_raises(ValueError, msg, wrapper, "foo")
     assert_raises(ValueError, msg, wrapper, 1.5)
 
@@ -105,6 +112,7 @@ def test_varargs():
     msg = "Incorrect type for variable"
     assert_raises(TypeError, msg, wrapper, 1.5, "foo")
     assert_raises(TypeError, msg, wrapper, "foo", "bar")
+    assert_raises(TypeError, msg, wrapper, *[tuple(), 5, 2])
 
 
 def test_kwargs():
@@ -114,6 +122,11 @@ def test_kwargs():
 
     assert wrapper(1) == 0
     assert wrapper(1, b=5, c=2) == 0
+
+    msg = "Incorrect type for variable"
+    assert_raises(TypeError, msg, wrapper, 1.5, b=2)
+    assert_raises(TypeError, msg, wrapper, "foo", k="bar")
+    assert_raises(TypeError, msg, wrapper, [], **dict(c=5, e="cat"))
 
     # We expect Python to handle duplicate
     # keyword arguments for us before validation.
@@ -146,6 +159,7 @@ class TestShortcuts(object):
 
         msg = "Expected a number but got"
         assert_raises(TypeError, msg, wrapper, "foo")
+        assert_raises(TypeError, msg, wrapper, [1, 2])
 
     def test_integer(self):
         @validate_inputs(a="integer")
@@ -157,6 +171,7 @@ class TestShortcuts(object):
         msg = "Expected an integer but got"
         assert_raises(TypeError, msg, wrapper, "foo")
         assert_raises(TypeError, msg, wrapper, 1.0)
+        assert_raises(TypeError, msg, wrapper, (1,))
 
     def test_even(self):
         @validate_inputs(a="even")
@@ -167,6 +182,7 @@ class TestShortcuts(object):
 
         msg = "Expected an integer but got"
         assert_raises(TypeError, msg, wrapper, "foo")
+        assert_raises(TypeError, msg, wrapper, (1,))
         assert_raises(TypeError, msg, wrapper, 2.0)
 
         msg = "Expected an even integer"
@@ -181,8 +197,9 @@ class TestShortcuts(object):
         assert wrapper(1) == 0
 
         msg = "Expected an integer but got"
-        assert_raises(TypeError, msg, wrapper, "foo")
         assert_raises(TypeError, msg, wrapper, 1.0)
+        assert_raises(TypeError, msg, wrapper, "foo")
+        assert_raises(TypeError, msg, wrapper, (-1, 5))
 
         msg = "Expected an odd integer"
         assert_raises(ValueError, msg, wrapper, 2)
