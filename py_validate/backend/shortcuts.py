@@ -130,12 +130,37 @@ class NegateFailure(Exception):
 class NegateShortcut(object):
 
     def __init__(self, shortcut):
+        """
+        Initialize a NegateShortcut instance.
+
+        Parameters
+        ----------
+        shortcut : The shortcut name associated with a function.
+
+        Raises
+        ------
+        ValueError : an invalid shortcut name was provided.
+        """
+
         self.shortcut = shortcut
         self.func = get_shortcut(shortcut)
         self.msg = ("Validation for '{shortcut}' "
                     "passed when it shouldn't have")
 
     def __call__(self, x):
+        """
+        Wrapper around the shortcut to check that it fails.
+
+        Parameters
+        ----------
+        x : object
+            The variable to check.
+
+        Raises
+        ------
+        NegateFailure : the validation function passes when it shouldn't have.
+        """
+
         try:
             self.func(x)
             raise NegateFailure(self.msg.format(shortcut=self.shortcut))

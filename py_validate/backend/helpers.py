@@ -12,7 +12,7 @@ class DocSubstitution(object):
     in incorrect inputs to this class.
     """
 
-    def __init__(self, tabs=0, **kwargs):
+    def __init__(self, tabs=0, **doc_params):
         """
         Initialize a DocSubstitution instance.
 
@@ -25,7 +25,7 @@ class DocSubstitution(object):
 
             This is also the default tabbing in case we pass in special
             tabbing requirements for a specific docstring substitution.
-        kwargs : kwargs
+        doc_params : kwargs
             The parameters that we are going to pass into the function
             docstring so that it displays the correct documentation.
 
@@ -36,7 +36,7 @@ class DocSubstitution(object):
 
         formatted_kwargs = {}
 
-        for param, value in kwargs.items():
+        for param, value in doc_params.items():
             if isinstance(value, tuple):
                 value, tabs_count = value
             else:  # just the parameter value
@@ -55,6 +55,11 @@ class DocSubstitution(object):
 
         Before calling the function, the docstring is filled with the
         parameters specified in the constructor (`self.params`).
+
+        Parameters
+        ----------
+        f : callable
+            The function that we wish to wrap with a new docstring.
 
         Returns
         -------

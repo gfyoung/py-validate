@@ -193,8 +193,8 @@ class ValidatedFunction(object):
         Raises
         ------
         TypeError : the argument had a type mismatch with `validator` OR
-                    the validator was an invalid one for checking
-        ValueError : the `validator` callable failed with `val`
+                    the validator was an invalid one for checking.
+        ValueError : the `validator` callable failed with `val`.
         """
 
         if validator is None:
