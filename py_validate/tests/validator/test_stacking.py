@@ -15,11 +15,15 @@ def test_two_inputs():
         return a + b
 
     assert wrapper(1, 2) == 3
+    assert wrapper(3, 14) == 17
+    assert wrapper(*(5, 17)) == 22
 
     msg = "Incorrect type for variable"
     assert_raises(TypeError, msg, wrapper, "foo", 1)
     assert_raises(TypeError, msg, wrapper, 1, "foo")
     assert_raises(TypeError, msg, wrapper, "foo", "foo")
+    assert_raises(TypeError, msg, wrapper, dict(), list())
+    assert_raises(TypeError, msg, wrapper, tuple([1, 3]), 4)
 
 
 def test_output_override():
@@ -32,9 +36,12 @@ def test_output_override():
             return a
 
     assert wrapper(0) == 0
+    assert wrapper(2) == 2
 
     msg = "Incorrect type for variable"
     assert_raises(TypeError, msg, wrapper, 0.0)
+    assert_raises(TypeError, msg, wrapper, "foo")
+    assert_raises(TypeError, msg, wrapper, [1, 2])
 
     msg = "items returned but got"
     assert_raises(ValueError, msg, wrapper, 1)
@@ -75,6 +82,7 @@ def test_input_output():
 
     msg = "Incorrect type for variable"
     assert_raises(TypeError, msg, wrapper, 0)
+    assert_raises(TypeError, msg, wrapper, dict())
 
     msg = "items returned but got"
     assert_raises(ValueError, msg, wrapper, 1)
@@ -96,6 +104,7 @@ def test_output_input():
 
     msg = "Incorrect type for variable"
     assert_raises(TypeError, msg, wrapper, 0)
+    assert_raises(TypeError, msg, wrapper, {1, 2})
 
     msg = "items returned but got"
     assert_raises(ValueError, msg, wrapper, 1)
@@ -117,6 +126,7 @@ def test_output_negative_count_stack():
 
     msg = "Incorrect type for variable"
     assert_raises(TypeError, msg, wrapper, 0)
+    assert_raises(TypeError, msg, wrapper, [1, 2])
 
     # We now evaluate the tuple object as is,
     # not the elements of the tuple itself.
@@ -165,6 +175,7 @@ def test_input_output_sandwich():
     assert_raises(TypeError, msg, wrapper, "foo", 1)
     assert_raises(TypeError, msg, wrapper, 1, "foo")
     assert_raises(TypeError, msg, wrapper, "foo", "foo")
+    assert_raises(TypeError, msg, wrapper, [1, 2], {1, 2})
 
 
 def test_shortcuts_stack():
