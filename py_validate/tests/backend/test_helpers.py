@@ -1,5 +1,5 @@
 """
-Unittests for the helper functions and objects.
+Unittests for the helper functions and classes.
 """
 
 from py_validate.backend.base import DocSubstitution, FrozenDict

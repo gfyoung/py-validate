@@ -1,3 +1,7 @@
+"""
+Unittests for shortcut (negation) utilities and functions.
+"""
+
 from py_validate.backend.shortcuts import NegateShortcut
 from py_validate.tests import assert_raises
 
