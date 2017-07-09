@@ -11,63 +11,62 @@ def f(a):
     return a
 
 
-def test_output_no_count():
-    @validate_outputs(None)
-    def wrapper(a):
-        if a == 1:
-            return f(a), f(a)
-        else:
-            return f(a)
+class TestOutputCount(object):
 
-    # No output count, no check.
-    assert wrapper(2) == 2
-    assert wrapper(1) == (1, 1)
+    def test_output_no_count(self):
+        @validate_outputs(None)
+        def wrapper(a):
+            if a == 1:
+                return f(a), f(a)
+            else:
+                return f(a)
 
+        # No output count, no check.
+        assert wrapper(2) == 2
+        assert wrapper(1) == (1, 1)
 
-def test_output_positive_count():
-    @validate_outputs(2)
-    def wrapper(a):
-        if a == 1:
-            return f(a), f(a)
-        else:
-            return f(a)
+    def test_output_positive_count(self):
+        @validate_outputs(2)
+        def wrapper(a):
+            if a == 1:
+                return f(a), f(a)
+            else:
+                return f(a)
 
-    assert wrapper(1) == (1, 1)
+        assert wrapper(1) == (1, 1)
 
-    msg = "items returned but got"
-    assert_raises(ValueError, msg, wrapper, 2)
+        msg = "items returned but got"
+        assert_raises(ValueError, msg, wrapper, 2)
 
+    def test_output_negative_count_no_validators(self):
+        @validate_outputs(-1)
+        def wrapper(a):
+            if a == 1:
+                return f(a), f(a)
+            else:
+                return f(a)
 
-def test_output_negative_count_no_validators():
-    @validate_outputs(-1)
-    def wrapper(a):
-        if a == 1:
-            return f(a), f(a)
-        else:
-            return f(a)
+        # Tuples are validated as is, and since
+        # no validators are provided, all outputs
+        # are accepted in this case.
+        assert wrapper(0) == 0
+        assert wrapper(1) == (1, 1)
 
-    # Tuples are validated as is, and since
-    # no validators are provided, all outputs
-    # are accepted in this case.
-    assert wrapper(0) == 0
-    assert wrapper(1) == (1, 1)
+    def test_output_negative_count_validators(self):
+        @validate_outputs(-1, tuple)
+        def wrapper(a):
+            if a == 1:
+                return f(a), f(a)
+            else:
+                return f(a)
 
+        # Tuples are validated as is, and in this
+        # case, we specifically check that we get
+        # a tuple from the function.
+        assert wrapper(1) == (1, 1)
 
-def test_output_negative_count_validators():
-    @validate_outputs(-1, tuple)
-    def wrapper(a):
-        if a == 1:
-            return f(a), f(a)
-        else:
-            return f(a)
-
-    # Tuples are validated as is, and in this
-    # case, we specifically check that we get
-    # a tuple from the function.
-    assert wrapper(1) == (1, 1)
-
-    msg = "Incorrect type for variable"
-    assert_raises(TypeError, msg, wrapper, 0)
+        msg = "Incorrect type for variable"
+        assert_raises(TypeError, msg, wrapper, 0)
 
 
 def test_basic():
@@ -80,7 +79,8 @@ def test_basic():
 
     msg = "Incorrect type for variable"
     assert_raises(TypeError, msg, wrapper, 1.5)
-    assert_raises(TypeError, msg, wrapper, 1.0)
+    assert_raises(TypeError, msg, wrapper, "foo")
+    assert_raises(TypeError, msg, wrapper, [1, 2, 3])
 
 
 def test_no_match():
@@ -137,6 +137,7 @@ class TestShortcuts(object):
 
         msg = "Expected a number but got"
         assert_raises(TypeError, msg, wrapper, "foo")
+        assert_raises(TypeError, msg, wrapper, {1, 2})
 
     def test_integer(self):
         @validate_outputs(None, "integer")
@@ -148,6 +149,7 @@ class TestShortcuts(object):
         msg = "Expected an integer"
         assert_raises(TypeError, msg, wrapper, 1.5)
         assert_raises(TypeError, msg, wrapper, "foo")
+        assert_raises(TypeError, msg, wrapper, [-1, -3])
 
     def test_even(self):
         @validate_outputs(None, "even")
@@ -159,6 +161,7 @@ class TestShortcuts(object):
         msg = "Expected an integer"
         assert_raises(TypeError, msg, wrapper, 1.5)
         assert_raises(TypeError, msg, wrapper, "foo")
+        assert_raises(TypeError, msg, wrapper, [3, 4])
 
         msg = "Expected an even integer"
         assert_raises(ValueError, msg, wrapper, 1)
@@ -173,6 +176,7 @@ class TestShortcuts(object):
         msg = "Expected an integer"
         assert_raises(TypeError, msg, wrapper, 1.5)
         assert_raises(TypeError, msg, wrapper, "foo")
+        assert_raises(TypeError, msg, wrapper, dict())
 
         msg = "Expected an odd integer"
         assert_raises(ValueError, msg, wrapper, 2)
