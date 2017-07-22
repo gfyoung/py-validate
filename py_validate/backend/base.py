@@ -34,9 +34,9 @@ output_len_doc = """exp_output_len : int > 0, -1, or None
     and verifying each of element of the tuple.
 
     We do this in order to disambiguate when a tuple object
-    is returned, and when multiple variables are returned.
-    In the former, we verify the tuple object, whereas in
-    the latter, we verify the elements of the tuple."""
+    is returned deliberately, and when multiple outputs are
+    returned. In the former, we verify the tuple object,
+    whereas in the latter, we verify the elements of the tuple."""
 
 
 class ValidatedFunction(object):

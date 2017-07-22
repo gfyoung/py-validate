@@ -13,7 +13,7 @@ from py_validate.backend.base import validator_doc, output_len_doc
 __all__ = ["validate_inputs", "validate_outputs"]
 
 validator_type_doc = """Each validator can either be a shortcut string, type,
-or callable, which be used to check whether the value
+or callable, which is used to check whether the value
 supplied for that argument is valid."""
 
 
@@ -34,8 +34,9 @@ def validate_inputs(**validators):
 
     Returns
     -------
-    input_validator_decorator : callable
-        A function decorator that can be used to validate function inputs.
+    validator_decorator : callable
+        A function decorator that can be used to validate function inputs
+        and outputs if decorated with `validate_outputs`.
     """
 
     def wrapper(f):
@@ -72,8 +73,9 @@ def validate_outputs(exp_output_len=None, *validators):
 
     Returns
     -------
-    output_validator_decorator : callable
-        A function decorator that can be used to validate function outputs.
+    validator_decorator : callable
+        A function decorator that can be used to validate function outputs
+        and inputs if decorated with `validate_inputs`.
     """
 
     def wrapper(f):

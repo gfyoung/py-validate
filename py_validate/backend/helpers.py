@@ -130,7 +130,7 @@ class FrozenDict(dict):
 
         Raises
         ------
-        KeyError : one of keys already exists in the dictionary.
+        KeyError : one of the keys already exists in the dictionary.
         """
 
         if new_mappings is not None:
