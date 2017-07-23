@@ -1,4 +1,4 @@
-from py_validate.validator import *  # noqa
+from py_validate.api import *  # noqa
 
 __version__ = "0.2.2"
 
