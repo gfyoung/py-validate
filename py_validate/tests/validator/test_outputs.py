@@ -3,7 +3,7 @@ Unittests for the output validator decorator.
 """
 
 from py_validate.backend.shortcuts import NegateFailure
-from py_validate.validator import validate_outputs
+from py_validate.api import validate_outputs
 from py_validate.tests import assert_raises
 
 

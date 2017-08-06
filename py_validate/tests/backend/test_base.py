@@ -35,7 +35,7 @@ class TestNamespace(object):
     def test_pv_namespace(self):
         import py_validate as pv
         expected = {"api", "backend", "test", "validate_inputs",
-                    "tests", "validate_outputs", "validator"}
+                    "tests", "validate_outputs"}
         self._check_namespace(pv, expected)
 
     def test_pv_backend_namespace(self):

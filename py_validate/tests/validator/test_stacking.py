@@ -3,7 +3,7 @@ Stacking tests for the decorators i.e. how functions behave when
 we start applying more than one of these decorators to a function.
 """
 
-from py_validate.validator import validate_inputs, validate_outputs
+from py_validate.api import validate_inputs, validate_outputs
 from py_validate.backend.shortcuts import NegateFailure
 from py_validate.tests import assert_raises
 
